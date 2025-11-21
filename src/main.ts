@@ -12,7 +12,7 @@ async function bootstrap() {
   const port = env().application.PORT;
   const globalPrefix = 'api/v1';
 
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix(globalPrefix);
 
   const config = new DocumentBuilder()
     .setTitle('Whatsapp POC')
