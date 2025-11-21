@@ -1,22 +1,16 @@
-FROM node:22-alpine AS build
+FROM node:20-alpine AS builder
 WORKDIR /app
-COPY .docker docker
-RUN chmod +x ./docker/entrypoint.sh
-COPY package.json .
-COPY package-lock.json .
-COPY tsconfig.json .
-COPY src ./src
-RUN npm i --ignore-scripts -g @nestjs/cli rimraf
+COPY package*.json ./
 RUN npm ci
+COPY . .
 RUN npm run build
 
-FROM node:22-alpine AS production
+FROM node:20-alpine AS production
 WORKDIR /app
-ENV NODE_ENV production
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/docker ./.docker
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/package*.json ./
-RUN npm prune --omit=dev
-USER node
-ENTRYPOINT ["./.docker/entrypoint.sh"]
+COPY --from=builder /app/dist ./dist
+COPY package*.json ./
+COPY entrypoint.sh ./
+RUN npm ci --omit-dev
+EXPOSE 3000
+RUN ["chmod", "+x", "./entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
