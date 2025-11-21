@@ -1,10 +1,39 @@
 import env from '@config/env';
+import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { SecuritySchemeObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(`API is running on port ${env().application.PORT}`);
+  const logger = new Logger('NestApplication');
+  const port = env().application.PORT;
+  const globalPrefix = 'api/v1';
+
+  app.setGlobalPrefix('api/v1');
+
+  const config = new DocumentBuilder()
+    .setTitle('Whatsapp POC')
+    .setDescription('Integration with WhatApp API')
+    .addBearerAuth(
+      {
+        type: 'http',
+        schema: 'Bearer',
+        bearerFormat: 'Token',
+      } as SecuritySchemeObject,
+      'Bearer',
+    )
+    .setVersion('1.0.0')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+
+  if (env().application.NODE_ENV === 'development') {
+    SwaggerModule.setup(`${globalPrefix}/docs`, app, document);
+  }
+
+  await app.listen(port, () => logger.log(`API is running on port ${port}`));
 }
 bootstrap();

@@ -1,4 +1,5 @@
 import configuration from '@config/env';
+import { HealthModule } from '@modules/health/health.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
@@ -8,6 +9,7 @@ import { ConfigModule } from '@nestjs/config';
       load: [configuration],
       isGlobal: true,
     }),
+    HealthModule,
   ],
   controllers: [],
   providers: [],
