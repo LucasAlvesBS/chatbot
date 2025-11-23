@@ -1,7 +1,9 @@
 import configuration from '@config/env';
-import { HealthModule } from '@modules/health/health.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+
+import { WhatsAppModule } from './channels/index';
+import { HealthModule } from './modules/index';
 
 @Module({
   imports: [
@@ -10,6 +12,7 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true,
     }),
     HealthModule,
+    WhatsAppModule,
   ],
   controllers: [],
   providers: [],
