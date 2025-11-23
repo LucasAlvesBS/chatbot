@@ -3,14 +3,16 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { SecuritySchemeObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
+import { VERSIONS } from '@shared/constants';
+import { Envs } from '@shared/enums/envs.enum';
 
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const logger = new Logger('NestApplication');
-  const port = env().application.PORT;
-  const globalPrefix = 'api/v1';
+  const port = env().application.port;
+  const globalPrefix = `api/v${VERSIONS.API}`;
 
   app.setGlobalPrefix(globalPrefix);
 
@@ -30,7 +32,7 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
 
-  if (env().application.NODE_ENV === 'development') {
+  if (env().application.nodeEnv === Envs.DEV) {
     SwaggerModule.setup(`${globalPrefix}/docs`, app, document);
   }
 
