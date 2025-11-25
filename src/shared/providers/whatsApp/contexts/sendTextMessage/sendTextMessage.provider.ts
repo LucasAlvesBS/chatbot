@@ -1,6 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { BadGatewayException, Injectable, Logger } from '@nestjs/common';
 import { CODE_MESSAGE, MESSAGES } from '@shared/constants';
+import { Channels, MessageTypes } from '@shared/enums';
 import { IWhatsAppMessage } from '@shared/interfaces';
 import { snakeKeys } from 'js-convert-case';
 import { firstValueFrom } from 'rxjs';
@@ -14,9 +15,9 @@ export class SendTextMessageProvider {
   async execute(to: string, message: string) {
     try {
       const payload: IWhatsAppMessage = {
-        messagingProduct: 'whatsapp',
+        messagingProduct: Channels.WHATSAPP,
         to,
-        type: 'text',
+        type: MessageTypes.TEXT,
         text: { body: message },
       };
 

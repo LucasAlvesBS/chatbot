@@ -1,5 +1,5 @@
+import { ChatbotModule } from '@core/chatbot/chatbot.module';
 import { Module } from '@nestjs/common';
-import { WhatsappProviderModule } from '@shared/providers';
 
 import {
   ReceiveWhatsAppMessageController,
@@ -11,7 +11,7 @@ import {
 } from './contexts/verifyWebhook';
 
 @Module({
-  imports: [WhatsappProviderModule],
+  imports: [ChatbotModule],
   controllers: [
     ReceiveWhatsAppMessageController,
     VerifyWhatsAppWebhookController,
