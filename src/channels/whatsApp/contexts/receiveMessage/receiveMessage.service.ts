@@ -7,8 +7,8 @@ import { ReceiveWhatsAppMessageRequestDTO } from './dtos';
 export class ReceiveWhatsAppMessageService {
   constructor(private provider: SendTextMessageProvider) {}
 
-  async execute(payload: ReceiveWhatsAppMessageRequestDTO) {
-    const message = payload.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
+  async execute(dto: ReceiveWhatsAppMessageRequestDTO) {
+    const message = dto.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
 
     if (!message) return;
 
