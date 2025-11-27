@@ -15,10 +15,14 @@ export class ReceiveWhatsAppMessageService {
 
     const from = message.from;
     const text = message.text?.body || message.button?.text;
+    console.log('message');
+    console.log(message);
+    console.log('text');
+    console.log(text);
 
     await this.service.execute({
       channel: Channels.WHATSAPP,
-      from,
+      senderPhoneNumber: from,
       message: text,
     });
 

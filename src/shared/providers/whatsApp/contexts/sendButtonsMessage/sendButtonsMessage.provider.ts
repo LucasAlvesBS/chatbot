@@ -2,23 +2,35 @@ import { HttpService } from '@nestjs/axios';
 import { BadGatewayException, Injectable, Logger } from '@nestjs/common';
 import { CODE_MESSAGE, MESSAGES } from '@shared/constants';
 import { Channels, MessageTypes } from '@shared/enums';
-import { ISimpleMessage, IWhatsAppMessage } from '@shared/interfaces';
+import { IButtonMessage, IWhatsAppButtonsMessage } from '@shared/interfaces';
 import { snakeKeys } from 'js-convert-case';
 import { firstValueFrom } from 'rxjs';
 
 @Injectable()
-export class SendTextMessageProvider {
+export class SendButtonsMessageProvider {
   constructor(private readonly httpService: HttpService) {}
 
-  private readonly logger = new Logger(SendTextMessageProvider.name);
+  private readonly logger = new Logger(SendButtonsMessageProvider.name);
 
-  async execute({ to, message }: ISimpleMessage) {
+  async execute({ to, message, buttons }: IButtonMessage) {
     try {
-      const payload: IWhatsAppMessage = {
+      const payload: IWhatsAppButtonsMessage = {
         messagingProduct: Channels.WHATSAPP,
         to,
-        type: MessageTypes.TEXT,
-        text: { body: message },
+        type: MessageTypes.INTERACTIVE,
+        interactive: {
+          type: MessageTypes.BUTTON,
+          body: { text: message },
+          action: {
+            buttons: buttons.map((button) => ({
+              type: MessageTypes.REPLY,
+              reply: {
+                id: button.id,
+                title: button.title,
+              },
+            })),
+          },
+        },
       };
 
       const response = await firstValueFrom(

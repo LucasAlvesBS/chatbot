@@ -2,6 +2,7 @@ import env from '@config/env';
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 
+import { SendButtonsMessageProvider } from './contexts/sendButtonsMessage';
 import { SendTextMessageProvider } from './contexts/sendTextMessage';
 
 @Module({
@@ -18,7 +19,7 @@ import { SendTextMessageProvider } from './contexts/sendTextMessage';
       },
     }),
   ],
-  providers: [SendTextMessageProvider],
-  exports: [SendTextMessageProvider],
+  providers: [SendTextMessageProvider, SendButtonsMessageProvider],
+  exports: [SendTextMessageProvider, SendButtonsMessageProvider],
 })
 export class WhatsappProviderModule {}
