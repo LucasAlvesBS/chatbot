@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 
-import { CheckController } from './contexts/check/check.controller';
-import { CheckService } from './contexts/check/check.service';
+import { CheckController, CheckService } from './contexts/check';
 
 @Module({
   imports: [TerminusModule],
