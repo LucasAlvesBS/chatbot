@@ -2,12 +2,12 @@ import { Module } from '@nestjs/common';
 import { WhatsappProviderModule } from '@shared/providers';
 import { SessionModule } from '@shared/redis/session/session.module';
 
-import { ChatbotService } from './chatbot.service';
+import { WhatsAppChatbotService } from './channels/whatsApp/chatbot.service';
 
 @Module({
   imports: [WhatsappProviderModule, SessionModule],
   controllers: [],
-  providers: [ChatbotService],
-  exports: [ChatbotService],
+  providers: [WhatsAppChatbotService],
+  exports: [WhatsAppChatbotService],
 })
 export class ChatbotModule {}

@@ -12,7 +12,7 @@ import {
 } from '@shared/redis/session';
 
 @Injectable()
-export class ChatbotService {
+export class WhatsAppChatbotService {
   constructor(
     private readonly provider: SendButtonsMessageProvider,
     private readonly getStateInSession: GetStateInSessionService,
