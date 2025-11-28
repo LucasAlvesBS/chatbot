@@ -7,18 +7,29 @@ import {
   ValidateNested,
 } from 'class-validator';
 
-export class ButtonInReceivedMessageDTO {
+export class ButtonReplyInReceivedMessageDTO {
   @Expose()
-  @ApiPropertyOptional()
+  @ApiProperty()
   @IsString()
-  @IsOptional()
-  payload?: string;
+  id: string;
 
   @Expose()
-  @ApiPropertyOptional()
+  @ApiProperty()
   @IsString()
-  @IsOptional()
-  text?: string;
+  title: string;
+}
+
+export class InteractiveInReceivedMessageDTO {
+  @Expose()
+  @ApiProperty()
+  @IsString()
+  type: string;
+
+  @Expose()
+  @ApiProperty({ type: ButtonReplyInReceivedMessageDTO })
+  @ValidateNested()
+  @Type(() => ButtonReplyInReceivedMessageDTO)
+  buttonReply: ButtonReplyInReceivedMessageDTO;
 }
 
 export class TextInReceivedMessageDTO {
@@ -58,11 +69,11 @@ export class MessageInReceivedMessageDTO {
   text?: TextInReceivedMessageDTO;
 
   @Expose()
-  @ApiPropertyOptional({ type: ButtonInReceivedMessageDTO })
+  @ApiPropertyOptional({ type: InteractiveInReceivedMessageDTO })
   @ValidateNested()
-  @Type(() => ButtonInReceivedMessageDTO)
+  @Type(() => InteractiveInReceivedMessageDTO)
   @IsOptional()
-  button?: ButtonInReceivedMessageDTO;
+  interactive?: InteractiveInReceivedMessageDTO;
 }
 
 export class NameInReceivedMessageDTO {
@@ -169,13 +180,13 @@ class ValueOfChangesInReceivedMessageDTO {
   @ApiProperty({ isArray: true, type: ContactsInReceivedMessageDTO })
   @Type(() => ContactsInReceivedMessageDTO)
   @ValidateNested({ each: true })
-  contacts: ContactsInReceivedMessageDTO[];
+  contacts?: ContactsInReceivedMessageDTO[];
 
   @Expose()
   @ApiProperty({ isArray: true, type: MessageInReceivedMessageDTO })
   @Type(() => MessageInReceivedMessageDTO)
   @ValidateNested({ each: true })
-  messages: MessageInReceivedMessageDTO[];
+  messages?: MessageInReceivedMessageDTO[];
 }
 
 class ChangesOfEntryInReceivedMessageDTO {
