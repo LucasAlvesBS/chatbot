@@ -1,6 +1,6 @@
 import { bullMQConfig } from '@config/bullMQ';
 import { Module } from '@nestjs/common';
-import { PROVIDERS } from '@shared/constants/providers.constant';
+import { PROVIDERS } from '@shared/constants';
 import Redis, { RedisOptions } from 'ioredis';
 
 @Module({

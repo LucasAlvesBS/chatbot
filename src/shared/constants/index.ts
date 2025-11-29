@@ -5,6 +5,7 @@ export * from './locales.constant';
 export * from './logMessages.constant';
 export * from './parameters.constant';
 export * from './paths.constant';
+export * from './providers.constant';
 export * from './queueNames.constant';
 export * from './versions.contant';
 export * from './webhooks.constant';

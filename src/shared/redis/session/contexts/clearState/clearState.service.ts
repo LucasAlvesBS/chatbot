@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CACHE } from '@shared/constants';
-import { PROVIDERS } from '@shared/constants/providers.constant';
+import { PROVIDERS } from '@shared/constants';
 import Redis from 'ioredis';
 
 @Injectable()

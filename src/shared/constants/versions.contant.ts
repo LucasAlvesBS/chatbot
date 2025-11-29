@@ -1,3 +1,4 @@
 export const VERSIONS = {
-  API: '1',
-};
+  API: 'v1',
+  CALENDAR: 'v3',
+} as const;

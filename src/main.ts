@@ -12,7 +12,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const logger = new Logger('NestApplication');
   const port = env().application.apiPort;
-  const globalPrefix = `api/v${VERSIONS.API}`;
+  const globalPrefix = `api/${VERSIONS.API}`;
 
   app.setGlobalPrefix(globalPrefix);
 
