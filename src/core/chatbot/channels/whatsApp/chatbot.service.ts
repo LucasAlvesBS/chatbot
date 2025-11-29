@@ -21,18 +21,23 @@ export class WhatsAppChatbotService {
   async execute(unifiedMessage: IUnifiedMessage) {
     const { senderPhoneNumber, message } = unifiedMessage;
 
-    const locale = this.getLocaleI18nForWhatsAppService.execute(LOCALES.PT_BR);
+    const { welcome } = this.getLocaleI18nForWhatsAppService.execute(
+      LOCALES.PT_BR,
+    );
+
     const state = await this.getStateInSession.execute(senderPhoneNumber);
 
     if (!state) {
-      await this.sendWelcomeMenu(senderPhoneNumber, locale);
+      await this.sendWelcomeMenu(senderPhoneNumber, { welcome });
       await this.setStateInSession.execute(senderPhoneNumber, CACHE.MENU_SENT);
       return { status: 'welcome_menu_sent' };
     }
 
-    const scheduling = locale.welcome.buttons[0].title;
-    const cancellation = locale.welcome.buttons[1].title;
-    const humanService = locale.welcome.buttons[2].title;
+    const { buttons } = welcome;
+
+    const scheduling = buttons[0].title;
+    const cancellation = buttons[1].title;
+    const humanService = buttons[2].title;
 
     switch (message) {
       case scheduling:
@@ -40,8 +45,8 @@ export class WhatsAppChatbotService {
         return { status: 'flow_scheduling_started' };
 
       case cancellation:
-        console.log('flow_scheduling_started');
-        return { status: 'flow_scheduling_started' };
+        console.log('flow_cancellation_started');
+        return { status: 'flow_cancellation_started' };
 
       case humanService:
         console.log('send_to_human');
