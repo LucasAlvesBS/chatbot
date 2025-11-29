@@ -11,7 +11,7 @@ import { ListEventsInCalendarService } from './contexts/listEvents';
 @Module({
   providers: [
     {
-      provide: PROVIDERS.GOOGLE_CALENDAR,
+      provide: PROVIDERS.CALENDAR_PROVIDER,
       useFactory: () => {
         return google.calendar({
           version: VERSIONS.CALENDAR,
@@ -29,4 +29,4 @@ import { ListEventsInCalendarService } from './contexts/listEvents';
     ListEventsInCalendarService,
   ],
 })
-export class CalendarModule {}
+export class CalendarProviderModule {}

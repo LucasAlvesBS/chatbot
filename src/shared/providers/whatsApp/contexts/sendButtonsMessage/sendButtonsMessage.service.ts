@@ -1,7 +1,12 @@
 import { HttpService } from '@nestjs/axios';
 import { BadGatewayException, Injectable, Logger } from '@nestjs/common';
 import { CODE_MESSAGE, MESSAGES } from '@shared/constants';
-import { Channels, MessageTypes } from '@shared/enums';
+import {
+  Channels,
+  MessageButtonTypes,
+  MessageInteractiveTypes,
+  MessageTypes,
+} from '@shared/enums';
 import {
   IButtonMessage,
   IWhatsAppButton,
@@ -11,15 +16,15 @@ import { snakeKeys } from 'js-convert-case';
 import { firstValueFrom } from 'rxjs';
 
 @Injectable()
-export class SendButtonsMessageProvider {
+export class SendButtonsMessageService {
   constructor(private readonly httpService: HttpService) {}
 
-  private readonly logger = new Logger(SendButtonsMessageProvider.name);
+  private readonly logger = new Logger(SendButtonsMessageService.name);
 
   async execute({ to, message, buttons }: IButtonMessage) {
     try {
       const whatsAppButtons: IWhatsAppButton[] = buttons.map((button) => ({
-        type: MessageTypes.REPLY,
+        type: MessageButtonTypes.REPLY,
         reply: {
           id: button.id,
           title: button.title,
@@ -31,7 +36,7 @@ export class SendButtonsMessageProvider {
         to,
         type: MessageTypes.INTERACTIVE,
         interactive: {
-          type: MessageTypes.BUTTON,
+          type: MessageInteractiveTypes.BUTTON,
           body: { text: message },
           action: {
             buttons: whatsAppButtons,

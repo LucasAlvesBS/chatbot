@@ -1,6 +1,13 @@
 export enum MessageTypes {
   TEXT = 'text',
-  BUTTON = 'button',
-  REPLY = 'reply',
   INTERACTIVE = 'interactive',
+}
+
+export enum MessageInteractiveTypes {
+  BUTTON = 'button',
+  LIST = 'list',
+}
+
+export enum MessageButtonTypes {
+  REPLY = 'reply',
 }

@@ -12,4 +12,4 @@ import { RegisterEventsConsumer } from './consumers';
   exports: [BullModule],
   providers: [RegisterEventsConsumer],
 })
-export class QueueModule {}
+export class QueueProviderModule {}

@@ -7,10 +7,10 @@ import { snakeKeys } from 'js-convert-case';
 import { firstValueFrom } from 'rxjs';
 
 @Injectable()
-export class SendTextMessageProvider {
+export class SendTextMessageService {
   constructor(private readonly httpService: HttpService) {}
 
-  private readonly logger = new Logger(SendTextMessageProvider.name);
+  private readonly logger = new Logger(SendTextMessageService.name);
 
   async execute({ to, message }: ISimpleMessage) {
     try {

@@ -1,1 +1,1 @@
-export * from './sendButtonsMessage.provider';
+export * from './sendButtonsMessage.service';

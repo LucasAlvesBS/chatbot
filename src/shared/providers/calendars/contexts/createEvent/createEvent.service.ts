@@ -5,7 +5,7 @@ import { calendar_v3 } from 'googleapis';
 @Injectable()
 export class CreateEventInCalendarService {
   constructor(
-    @Inject(PROVIDERS.GOOGLE_CALENDAR)
+    @Inject(PROVIDERS.CALENDAR_PROVIDER)
     private readonly calendar: calendar_v3.Calendar,
   ) {}
 

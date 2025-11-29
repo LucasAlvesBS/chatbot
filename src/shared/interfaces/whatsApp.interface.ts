@@ -1,7 +1,10 @@
-export interface IWhatsAppMessage {
+export interface IWhatsAppDefaultPayload {
   messagingProduct: string;
   to: string;
   type: string;
+}
+
+export interface IWhatsAppMessage extends IWhatsAppDefaultPayload {
   text: {
     body: string;
   };
@@ -15,10 +18,8 @@ export interface IWhatsAppButton {
   };
 }
 
-export interface IWhatsAppButtonsMessagePayload {
-  messagingProduct: string;
-  to: string;
-  type: string;
+export interface IWhatsAppButtonsMessagePayload
+  extends IWhatsAppDefaultPayload {
   interactive: {
     type: string;
     body: { text: string };
@@ -28,9 +29,8 @@ export interface IWhatsAppButtonsMessagePayload {
   };
 }
 
-export interface IWhatsAppInteractiveListPayload {
-  to: string;
-  type: string;
+export interface IWhatsAppInteractiveListPayload
+  extends IWhatsAppDefaultPayload {
   interactive: {
     type: string;
     header?: {

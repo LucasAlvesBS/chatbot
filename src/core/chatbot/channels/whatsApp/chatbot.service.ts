@@ -1,9 +1,10 @@
-import { GetLocaleI18nForWhatsAppService } from '@core/i18n';
+import { ScheduleAppointmentViaWhatsAppService } from '@core/chatbot/flows/whatsApp';
+import { GetLocaleI18nForWhatsAppService } from '@core/i18n/contexts';
 import { Injectable } from '@nestjs/common';
 import { CACHE, LOCALES } from '@shared/constants';
 import { ILocaleSchemaForWhatsApp } from '@shared/interfaces';
 import { IButtonMessage, IUnifiedMessage } from '@shared/interfaces';
-import { SendButtonsMessageProvider } from '@shared/providers/whatsApp/contexts/sendButtonsMessage';
+import { SendButtonsMessageService } from '@shared/providers/whatsApp';
 import {
   GetStateInSessionService,
   SetStateInSessionService,
@@ -12,13 +13,14 @@ import {
 @Injectable()
 export class WhatsAppChatbotService {
   constructor(
-    private readonly provider: SendButtonsMessageProvider,
+    private readonly sendButtonsMessageService: SendButtonsMessageService,
+    private readonly scheduleAppointmentViaWhatsAppService: ScheduleAppointmentViaWhatsAppService,
     private readonly getStateInSession: GetStateInSessionService,
     private readonly setStateInSession: SetStateInSessionService,
     private readonly getLocaleI18nForWhatsAppService: GetLocaleI18nForWhatsAppService,
   ) {}
 
-  async execute(unifiedMessage: IUnifiedMessage) {
+  async execute(unifiedMessage: IUnifiedMessage): Promise<void> {
     const { senderPhoneNumber, message } = unifiedMessage;
 
     const { welcome } = this.getLocaleI18nForWhatsAppService.execute(
@@ -28,9 +30,10 @@ export class WhatsAppChatbotService {
     const state = await this.getStateInSession.execute(senderPhoneNumber);
 
     if (!state) {
-      await this.sendWelcomeMenu(senderPhoneNumber, { welcome });
-      await this.setStateInSession.execute(senderPhoneNumber, CACHE.MENU_SENT);
-      return { status: 'welcome_menu_sent' };
+      await Promise.all([
+        this.sendWelcomeMenu(senderPhoneNumber, { welcome }),
+        this.setStateInSession.execute(senderPhoneNumber, CACHE.MENU_SENT),
+      ]);
     }
 
     const { buttons } = welcome;
@@ -41,19 +44,16 @@ export class WhatsAppChatbotService {
 
     switch (message) {
       case scheduling:
-        console.log('flow_scheduling_started');
-        return { status: 'flow_scheduling_started' };
+        return this.scheduleAppointmentViaWhatsAppService.execute(
+          senderPhoneNumber,
+        );
 
       case cancellation:
         console.log('flow_cancellation_started');
-        return { status: 'flow_cancellation_started' };
 
       case humanService:
         console.log('send_to_human');
-        return { status: 'send_to_human' };
     }
-
-    return { status: 'ok' };
   }
 
   private async sendWelcomeMenu(to: string, locale: ILocaleSchemaForWhatsApp) {
@@ -62,12 +62,9 @@ export class WhatsAppChatbotService {
     const buttonMessage: IButtonMessage = {
       to,
       message,
-      buttons: locale.welcome.buttons.map((button) => ({
-        id: button.id,
-        title: button.title,
-      })),
+      buttons: locale.welcome.buttons,
     };
 
-    await this.provider.execute(buttonMessage);
+    await this.sendButtonsMessageService.execute(buttonMessage);
   }
 }

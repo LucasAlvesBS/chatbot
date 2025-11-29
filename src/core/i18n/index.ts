@@ -1,1 +1,1 @@
-export * from './contexts/getLocale/whatsApp';
+export { I18nModule } from './i18n.module';

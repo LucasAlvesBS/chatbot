@@ -1,1 +1,1 @@
-export * from './sendTextMessage.provider';
+export * from './sendTextMessage.service';
