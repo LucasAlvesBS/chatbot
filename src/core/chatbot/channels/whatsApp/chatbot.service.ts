@@ -1,9 +1,7 @@
+import { GetLocaleI18nForWhatsAppService } from '@core/i18n';
 import { Injectable } from '@nestjs/common';
-import {
-  CACHE,
-  WELCOME_BUTTON_IDS,
-  WELCOME_BUTTON_TITLES,
-} from '@shared/constants';
+import { CACHE, LOCALES } from '@shared/constants';
+import { ILocaleSchemaForWhatsApp } from '@shared/interfaces';
 import { IButtonMessage, IUnifiedMessage } from '@shared/interfaces';
 import { SendButtonsMessageProvider } from '@shared/providers/whatsApp/contexts/sendButtonsMessage';
 import {
@@ -17,58 +15,52 @@ export class WhatsAppChatbotService {
     private readonly provider: SendButtonsMessageProvider,
     private readonly getStateInSession: GetStateInSessionService,
     private readonly setStateInSession: SetStateInSessionService,
+    private readonly getLocaleI18nForWhatsAppService: GetLocaleI18nForWhatsAppService,
   ) {}
 
-  async execute(input: IUnifiedMessage) {
-    const { senderPhoneNumber, message } = input;
+  async execute(unifiedMessage: IUnifiedMessage) {
+    const { senderPhoneNumber, message } = unifiedMessage;
 
+    const locale = this.getLocaleI18nForWhatsAppService.execute(LOCALES.PT_BR);
     const state = await this.getStateInSession.execute(senderPhoneNumber);
-    console.log(state);
-    console.log(message);
+
     if (!state) {
-      await this.sendWelcomeMenu(senderPhoneNumber);
+      await this.sendWelcomeMenu(senderPhoneNumber, locale);
       await this.setStateInSession.execute(senderPhoneNumber, CACHE.MENU_SENT);
       return { status: 'welcome_menu_sent' };
     }
 
-    if (message === WELCOME_BUTTON_TITLES.SCHEDULING) {
-      console.log('flow_scheduling_started');
-      return { status: 'flow_scheduling_started' };
-    }
+    const scheduling = locale.welcome.buttons[0].title;
+    const cancellation = locale.welcome.buttons[1].title;
+    const humanService = locale.welcome.buttons[2].title;
 
-    if (message === WELCOME_BUTTON_TITLES.CANCELLATION) {
-      console.log('flow_scheduling_started');
-      return { status: 'flow_scheduling_started' };
-    }
+    switch (message) {
+      case scheduling:
+        console.log('flow_scheduling_started');
+        return { status: 'flow_scheduling_started' };
 
-    if (message === WELCOME_BUTTON_TITLES.HUMAN_SERVICE) {
-      console.log('send_to_human');
-      return { status: 'send_to_human' };
+      case cancellation:
+        console.log('flow_scheduling_started');
+        return { status: 'flow_scheduling_started' };
+
+      case humanService:
+        console.log('send_to_human');
+        return { status: 'send_to_human' };
     }
 
     return { status: 'ok' };
   }
 
-  private async sendWelcomeMenu(to: string) {
-    const message = 'Olá! Sou o recepcionista que vai lhe ajudar.';
+  private async sendWelcomeMenu(to: string, locale: ILocaleSchemaForWhatsApp) {
+    const message = locale.welcome.message;
 
     const buttonMessage: IButtonMessage = {
       to,
       message,
-      buttons: [
-        {
-          id: WELCOME_BUTTON_IDS.SCHEDULING,
-          title: WELCOME_BUTTON_TITLES.SCHEDULING,
-        },
-        {
-          id: WELCOME_BUTTON_IDS.CANCELLATION,
-          title: WELCOME_BUTTON_TITLES.CANCELLATION,
-        },
-        {
-          id: WELCOME_BUTTON_IDS.HUMAN_SERVICE,
-          title: WELCOME_BUTTON_TITLES.HUMAN_SERVICE,
-        },
-      ],
+      buttons: locale.welcome.buttons.map((button) => ({
+        id: button.id,
+        title: button.title,
+      })),
     };
 
     await this.provider.execute(buttonMessage);
