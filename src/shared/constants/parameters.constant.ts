@@ -1,8 +1,6 @@
-import Bull from 'bull';
-
-export const BULL_MQ_RETRY_CONFIG: Bull.JobOptions = {
-  delay: 1000,
-  attempts: 3,
+export const BULL_MQ_PARAMETER = {
+  DELAY: 1000,
+  ATTEMPTS: 3,
 };
 
 export const SESSION_PARAMETER = {

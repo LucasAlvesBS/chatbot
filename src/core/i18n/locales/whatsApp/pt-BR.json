@@ -1,15 +1,15 @@
 {
   "welcome": {
-    "message": "Olá! Sou o recepcionista que vai lhe ajudar.",
+    "message": "Olá! 👋\n\nSou o *Assistente Virtual* 🩺\nEstou aqui para lhe ajudar com seu atendimento.\n\nComo posso ajudar hoje?",
     "buttons": [
-      { "id": "scheduling", "title": "Agendar consulta" },
-      { "id": "cancellation", "title": "Cancelar consulta" },
-      { "id": "human_service", "title": "Atendimento humano" }
+      { "id": "scheduling", "title": "Agendar consulta 📅" },
+      { "id": "cancellation", "title": "Cancelar consulta ❌" },
+      { "id": "human_service", "title": "Atendente humano 👩‍⚕️" }
     ]
   },
   "flow": {
     "schedulingStarted": {
-      "message":"Combinado! Agora precisamos saber em qual mês você gostaria de realizar a consulta.",
+      "message":"Perfeito! 😊\n\nVamos iniciar seu *agendamento de consulta médica*.\n\nPara continuarmos, por favor selecione o **mês** em que deseja realizar sua consulta.",
       "buttonLabel": "Selecionar mês",
       "section": {
         "title": "Meses disponíveis",
