@@ -9,25 +9,25 @@
   },
   "flow": {
     "schedulingStarted": {
-      "sections": [
-        {
-          "title": "Meses disponíveis",
-          "rows": [
-            { "id": "month_01", "title": "Janeiro" },
-            { "id": "month_02", "title": "Fevereiro" },
-            { "id": "month_03", "title": "Março" },
-            { "id": "month_04", "title": "Abril" },
-            { "id": "month_05", "title": "Maio" },
-            { "id": "month_06", "title": "Junho" },
-            { "id": "month_07", "title": "Julho" },
-            { "id": "month_08", "title": "Agosto" },
-            { "id": "month_09", "title": "Setembro" },
-            { "id": "month_10", "title": "Outubro" },
-            { "id": "month_11", "title": "Novembro" },
-            { "id": "month_12", "title": "Dezembro" }
-          ]
-        }
-      ]
+      "message":"Combinado! Agora precisamos saber em qual mês você gostaria de realizar a consulta.",
+      "buttonLabel": "Selecionar mês",
+      "section": {
+        "title": "Meses disponíveis",
+        "rows": [
+          { "id": "month_01", "title": "Janeiro" },
+          { "id": "month_02", "title": "Fevereiro" },
+          { "id": "month_03", "title": "Março" },
+          { "id": "month_04", "title": "Abril" },
+          { "id": "month_05", "title": "Maio" },
+          { "id": "month_06", "title": "Junho" },
+          { "id": "month_07", "title": "Julho" },
+          { "id": "month_08", "title": "Agosto" },
+          { "id": "month_09", "title": "Setembro" },
+          { "id": "month_10", "title": "Outubro" },
+          { "id": "month_11", "title": "Novembro" },
+          { "id": "month_12", "title": "Dezembro" }
+        ]
+      }
     }
   }
 }

@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { CACHE } from '@shared/constants';
+import { CACHE, SESSION_PARAMETER } from '@shared/constants';
 import { PROVIDERS } from '@shared/constants';
 import Redis from 'ioredis';
 
@@ -10,6 +10,11 @@ export class SetStateInSessionService {
   ) {}
 
   async execute(user: string, state: string): Promise<void> {
-    await this.redis.set(`${CACHE.CHAT_STATE}:${user}`, state);
+    await this.redis.set(
+      `${CACHE.CHAT_STATE}:${user}`,
+      state,
+      'EX',
+      SESSION_PARAMETER.CHAT_STATE_EXPIRATION,
+    );
   }
 }

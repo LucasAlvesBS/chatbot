@@ -21,7 +21,7 @@ export class WhatsAppChatbotService {
   ) {}
 
   async execute(unifiedMessage: IUnifiedMessage): Promise<void> {
-    const { senderPhoneNumber, message } = unifiedMessage;
+    const { senderPhoneNumber, message, replyId } = unifiedMessage;
 
     const { welcome } = this.getLocaleI18nForWhatsAppService.execute(
       LOCALES.PT_BR,
@@ -34,6 +34,8 @@ export class WhatsAppChatbotService {
         this.sendWelcomeMenu(senderPhoneNumber, { welcome }),
         this.setStateInSession.execute(senderPhoneNumber, CACHE.MENU_SENT),
       ]);
+
+      return;
     }
 
     const { buttons } = welcome;
@@ -50,9 +52,15 @@ export class WhatsAppChatbotService {
 
       case cancellation:
         console.log('flow_cancellation_started');
+        return;
 
       case humanService:
         console.log('send_to_human');
+        return;
+    }
+
+    if (replyId && replyId.startsWith('month_')) {
+      console.log('Mês selecionado:', message);
     }
   }
 

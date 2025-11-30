@@ -4,6 +4,7 @@ export interface IUnifiedMessage {
   channel: Channels;
   senderPhoneNumber: string;
   message: string;
+  replyId?: string;
 }
 
 export interface ISimpleMessage {
@@ -11,11 +12,13 @@ export interface ISimpleMessage {
   message: string;
 }
 
+export interface IButtonStructure {
+  id: string;
+  title: string;
+}
+
 export interface IButtonMessage extends ISimpleMessage {
-  buttons: {
-    id: string;
-    title: string;
-  }[];
+  buttons: IButtonStructure[];
 }
 
 export interface IRowStructure {

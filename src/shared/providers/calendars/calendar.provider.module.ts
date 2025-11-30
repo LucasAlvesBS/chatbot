@@ -6,6 +6,7 @@ import { google } from 'googleapis';
 
 import { CreateEventInCalendarService } from './contexts/createEvent';
 import { DeleteEventInCalendarService } from './contexts/deleteEvent';
+import { GetAvailableMonthsInCalendarService } from './contexts/getAvailableMonths';
 import { ListEventsInCalendarService } from './contexts/listEvents';
 
 @Module({
@@ -22,11 +23,13 @@ import { ListEventsInCalendarService } from './contexts/listEvents';
     CreateEventInCalendarService,
     DeleteEventInCalendarService,
     ListEventsInCalendarService,
+    GetAvailableMonthsInCalendarService,
   ],
   exports: [
     CreateEventInCalendarService,
     DeleteEventInCalendarService,
     ListEventsInCalendarService,
+    GetAvailableMonthsInCalendarService,
   ],
 })
 export class CalendarProviderModule {}

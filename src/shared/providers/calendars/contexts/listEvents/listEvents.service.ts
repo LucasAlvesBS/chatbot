@@ -9,9 +9,10 @@ export class ListEventsInCalendarService {
     private readonly calendar: calendar_v3.Calendar,
   ) {}
 
-  execute(calendarId: string) {
+  execute(calendarId: string, timeMin: string) {
     return this.calendar.events.list({
       calendarId,
+      timeMin,
       singleEvents: true,
       orderBy: 'startTime',
     });

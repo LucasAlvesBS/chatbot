@@ -7,6 +7,23 @@ import {
   ValidateNested,
 } from 'class-validator';
 
+export class ListReplyInReceivedMessageDTO {
+  @Expose()
+  @ApiProperty()
+  @IsString()
+  id: string;
+
+  @Expose()
+  @ApiProperty()
+  @IsString()
+  title: string;
+
+  @Expose()
+  @ApiProperty()
+  @IsString()
+  description?: string;
+}
+
 export class ButtonReplyInReceivedMessageDTO {
   @Expose()
   @ApiProperty()
@@ -29,7 +46,13 @@ export class InteractiveInReceivedMessageDTO {
   @ApiProperty({ type: ButtonReplyInReceivedMessageDTO })
   @ValidateNested()
   @Type(() => ButtonReplyInReceivedMessageDTO)
-  buttonReply: ButtonReplyInReceivedMessageDTO;
+  buttonReply?: ButtonReplyInReceivedMessageDTO;
+
+  @Expose()
+  @ApiProperty({ type: ListReplyInReceivedMessageDTO })
+  @ValidateNested()
+  @Type(() => ListReplyInReceivedMessageDTO)
+  listReply?: ListReplyInReceivedMessageDTO;
 }
 
 export class TextInReceivedMessageDTO {

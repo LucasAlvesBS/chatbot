@@ -13,7 +13,7 @@ export class ReceiveWhatsAppMessageController {
   constructor(private readonly service: ReceiveWhatsAppMessageService) {}
 
   @Post()
-  async index(@Body() body: ReceiveWhatsAppMessageRequestDTO) {
+  async index(@Body() body: ReceiveWhatsAppMessageRequestDTO): Promise<void> {
     const normalized = camelKeys(body, {
       recursive: true,
       recursiveInArray: true,
