@@ -1,3 +1,4 @@
+import { STARTS_WITH } from '@shared/constants';
 import {
   IMonthYear,
   INormalizedEvent,
@@ -12,7 +13,9 @@ export const filterMonthRowsFromLocale = (
   availableMonths: IMonthYear[],
 ): IRowStructure[] => {
   return availableMonths.map((item) => {
-    const row = allMonthRows.find((row) => row.id === `month_${item.month}`);
+    const row = allMonthRows.find(
+      (row) => row.id === `${STARTS_WITH.MONTH}${item.month}`,
+    );
 
     return {
       ...row,

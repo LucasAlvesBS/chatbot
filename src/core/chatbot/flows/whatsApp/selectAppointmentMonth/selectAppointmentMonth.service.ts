@@ -1,5 +1,5 @@
 import env from '@config/env';
-import { GetLocaleI18nForWhatsAppService } from '@core/i18n/contexts';
+import { GetLocaleI18nForWhatsAppService } from '@core/i18n/channels/whatsApp';
 import { Injectable } from '@nestjs/common';
 import { CACHE, LOCALES } from '@shared/constants';
 import { filterMonthRowsFromLocale } from '@shared/helpers';
@@ -8,7 +8,7 @@ import { SendInteractiveListsMessageService } from '@shared/providers/whatsApp';
 import { SetStateInSessionService } from '@shared/redis/session';
 
 @Injectable()
-export class ScheduleAppointmentViaWhatsAppService {
+export class SelectAppointmentMonthViaWhatsAppService {
   constructor(
     private readonly sendInteractiveListsMessageService: SendInteractiveListsMessageService,
     private readonly setStateInSession: SetStateInSessionService,
@@ -17,11 +17,11 @@ export class ScheduleAppointmentViaWhatsAppService {
   ) {}
 
   async execute(phoneNumber: string): Promise<void> {
-    await this.setStateInSession.execute(phoneNumber, CACHE.SCHEDULING_STARTED);
-
     const {
       flow: {
-        schedulingStarted: { message, buttonLabel, section },
+        schedulingStarted: {
+          monthSelection: { message, buttonLabel, section },
+        },
       },
     } = this.getLocaleI18nForWhatsAppService.execute(LOCALES.PT_BR);
 
@@ -48,5 +48,7 @@ export class ScheduleAppointmentViaWhatsAppService {
         },
       ],
     });
+
+    await this.setStateInSession.execute(phoneNumber, CACHE.SELECTED_MONTH);
   }
 }

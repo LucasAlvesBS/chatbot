@@ -3,5 +3,8 @@ export const bullMQEnvs = () => ({
     host: process.env.REDIS_HOST || 'localhost',
     port: process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT) : 6379,
     password: process.env.REDIS_PASSWORD,
+    chatStateExpiration: process.env.REDIS_CHAT_STATE_EXPIRATION
+      ? parseInt(process.env.REDIS_CHAT_STATE_EXPIRATION)
+      : 3600,
   },
 });

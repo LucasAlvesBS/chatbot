@@ -1,5 +1,6 @@
+import env from '@config/env';
 import { Inject, Injectable } from '@nestjs/common';
-import { CACHE, SESSION_PARAMETER } from '@shared/constants';
+import { CACHE } from '@shared/constants';
 import { PROVIDERS } from '@shared/constants';
 import Redis from 'ioredis';
 
@@ -14,7 +15,7 @@ export class SetStateInSessionService {
       `${CACHE.CHAT_STATE}:${user}`,
       state,
       'EX',
-      SESSION_PARAMETER.CHAT_STATE_EXPIRATION,
+      env().bullMQ.redis.chatStateExpiration,
     );
   }
 }

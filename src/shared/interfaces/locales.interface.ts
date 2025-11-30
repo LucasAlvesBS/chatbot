@@ -5,7 +5,7 @@ export interface IButtonMessageSchema {
   buttons: IButtonStructure[];
 }
 
-export interface IInteractiveListMessageWithoutDescriptionSchema {
+export interface IInteractiveListMessageSchema {
   message: string;
   buttonLabel: string;
   section: {
@@ -14,9 +14,14 @@ export interface IInteractiveListMessageWithoutDescriptionSchema {
   };
 }
 
+export interface ISchedulingStartedSchema {
+  monthSelection: IInteractiveListMessageSchema;
+  weekSelection: IInteractiveListMessageSchema;
+}
+
 export interface ILocaleSchemaForWhatsApp {
-  welcome?: IButtonMessageSchema;
-  flow?: {
-    schedulingStarted: IInteractiveListMessageWithoutDescriptionSchema;
+  welcome: IButtonMessageSchema;
+  flow: {
+    schedulingStarted: ISchedulingStartedSchema;
   };
 }

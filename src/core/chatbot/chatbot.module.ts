@@ -6,8 +6,12 @@ import {
 } from '@shared/providers';
 import { SessionModule } from '@shared/redis';
 
-import { WhatsAppChatbotService } from './channels/whatsApp/chatbot.service';
-import { ScheduleAppointmentViaWhatsAppService } from './flows/whatsApp/scheduleAppointment/scheduleAppointment.service';
+import { WhatsAppChatbotService } from './channels/whatsApp';
+import {
+  SelectAppointmentMonthViaWhatsAppService,
+  SelectAppointmentWeekViaWhatsAppService,
+  SendWelcomeMenuViaWhatsAppService,
+} from './flows/whatsApp';
 
 @Module({
   imports: [
@@ -16,7 +20,12 @@ import { ScheduleAppointmentViaWhatsAppService } from './flows/whatsApp/schedule
     I18nModule,
     CalendarProviderModule,
   ],
-  providers: [WhatsAppChatbotService, ScheduleAppointmentViaWhatsAppService],
+  providers: [
+    WhatsAppChatbotService,
+    SendWelcomeMenuViaWhatsAppService,
+    SelectAppointmentMonthViaWhatsAppService,
+    SelectAppointmentWeekViaWhatsAppService,
+  ],
   exports: [WhatsAppChatbotService],
 })
 export class ChatbotModule {}

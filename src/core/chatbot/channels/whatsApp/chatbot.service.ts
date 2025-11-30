@@ -1,53 +1,68 @@
-import { ScheduleAppointmentViaWhatsAppService } from '@core/chatbot/flows/whatsApp';
-import { GetLocaleI18nForWhatsAppService } from '@core/i18n/contexts';
-import { Injectable } from '@nestjs/common';
-import { CACHE, LOCALES } from '@shared/constants';
-import { ILocaleSchemaForWhatsApp } from '@shared/interfaces';
-import { IButtonMessage, IUnifiedMessage } from '@shared/interfaces';
-import { SendButtonsMessageService } from '@shared/providers/whatsApp';
 import {
-  GetStateInSessionService,
-  SetStateInSessionService,
-} from '@shared/redis/session';
+  SelectAppointmentMonthViaWhatsAppService,
+  SelectAppointmentWeekViaWhatsAppService,
+  SendWelcomeMenuViaWhatsAppService,
+} from '@core/chatbot/flows/whatsApp';
+import { GetLocaleI18nForWhatsAppService } from '@core/i18n/channels/whatsApp';
+import { Injectable } from '@nestjs/common';
+import { CACHE, LOCALES, STARTS_WITH } from '@shared/constants';
+import { IButtonStructure } from '@shared/interfaces';
+import { IUnifiedMessage } from '@shared/interfaces';
+import { GetStateInSessionService } from '@shared/redis/session';
 
 @Injectable()
 export class WhatsAppChatbotService {
   constructor(
-    private readonly sendButtonsMessageService: SendButtonsMessageService,
-    private readonly scheduleAppointmentViaWhatsAppService: ScheduleAppointmentViaWhatsAppService,
+    private readonly sendWelcomeMenuViaWhatsAppService: SendWelcomeMenuViaWhatsAppService,
+    private readonly selectAppointmentMonthViaWhatsAppService: SelectAppointmentMonthViaWhatsAppService,
+    private readonly selectAppointmentWeekViaWhatsAppService: SelectAppointmentWeekViaWhatsAppService,
     private readonly getStateInSession: GetStateInSessionService,
-    private readonly setStateInSession: SetStateInSessionService,
     private readonly getLocaleI18nForWhatsAppService: GetLocaleI18nForWhatsAppService,
   ) {}
 
   async execute(unifiedMessage: IUnifiedMessage): Promise<void> {
-    const { senderPhoneNumber, message, replyId } = unifiedMessage;
+    const { senderPhoneNumber, replyId } = unifiedMessage;
 
-    const { welcome } = this.getLocaleI18nForWhatsAppService.execute(
-      LOCALES.PT_BR,
-    );
+    const {
+      welcome: { message: welcomeMessage, buttons },
+    } = this.getLocaleI18nForWhatsAppService.execute(LOCALES.PT_BR);
 
     const state = await this.getStateInSession.execute(senderPhoneNumber);
 
     if (!state) {
-      await Promise.all([
-        this.sendWelcomeMenu(senderPhoneNumber, { welcome }),
-        this.setStateInSession.execute(senderPhoneNumber, CACHE.MENU_SENT),
-      ]);
-
-      return;
+      return this.sendWelcomeMenuViaWhatsAppService.execute(senderPhoneNumber, {
+        message: welcomeMessage,
+        buttons,
+      });
     }
 
-    const { buttons } = welcome;
+    switch (state) {
+      case CACHE.MENU_SENT:
+        return this.handleMenuSelection(replyId, senderPhoneNumber, buttons);
 
-    const scheduling = buttons[0].title;
-    const cancellation = buttons[1].title;
-    const humanService = buttons[2].title;
+      case CACHE.SELECTED_MONTH:
+      case CACHE.SELECTED_WEEK:
+        if (replyId?.startsWith(STARTS_WITH.MONTH)) {
+          return this.selectAppointmentWeekViaWhatsAppService.execute(
+            senderPhoneNumber,
+          );
+        }
+    }
+  }
 
-    switch (message) {
+  private handleMenuSelection(
+    replyId: string,
+    phoneNumber: string,
+    buttons: IButtonStructure[],
+  ) {
+    const scheduling = buttons[0].id;
+    const cancellation = buttons[1].id;
+    const humanService = buttons[2].id;
+
+    switch (replyId) {
       case scheduling:
-        return this.scheduleAppointmentViaWhatsAppService.execute(
-          senderPhoneNumber,
+        return this.selectAppointmentMonthViaWhatsAppService.execute(
+          phoneNumber,
         );
 
       case cancellation:
@@ -58,21 +73,5 @@ export class WhatsAppChatbotService {
         console.log('send_to_human');
         return;
     }
-
-    if (replyId && replyId.startsWith('month_')) {
-      console.log('Mês selecionado:', message);
-    }
-  }
-
-  private async sendWelcomeMenu(to: string, locale: ILocaleSchemaForWhatsApp) {
-    const message = locale.welcome.message;
-
-    const buttonMessage: IButtonMessage = {
-      to,
-      message,
-      buttons: locale.welcome.buttons,
-    };
-
-    await this.sendButtonsMessageService.execute(buttonMessage);
   }
 }
