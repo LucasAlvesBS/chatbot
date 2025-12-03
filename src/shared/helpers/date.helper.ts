@@ -8,3 +8,7 @@ export const nowInBrazil = (): DateTime => {
 export const toBrazilDate = (iso: string): DateTime => {
   return DateTime.fromISO(iso, { zone: TIMEZONES.BRAZIL });
 };
+
+export const startDay = (monthDate: DateTime): number => {
+  return monthDate.hasSame(nowInBrazil(), 'month') ? nowInBrazil().day : 1;
+};

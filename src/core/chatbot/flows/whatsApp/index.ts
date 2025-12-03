@@ -1,3 +1,3 @@
+export * from './selectAppointmentDay';
 export * from './selectAppointmentMonth';
-export * from './selectAppointmentWeek';
 export * from './sendWelcomeMenu';

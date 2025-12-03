@@ -8,8 +8,8 @@ import { SessionModule } from '@shared/redis';
 
 import { WhatsAppChatbotService } from './channels/whatsApp';
 import {
+  SelectAppointmentDayViaWhatsAppService,
   SelectAppointmentMonthViaWhatsAppService,
-  SelectAppointmentWeekViaWhatsAppService,
   SendWelcomeMenuViaWhatsAppService,
 } from './flows/whatsApp';
 
@@ -24,7 +24,7 @@ import {
     WhatsAppChatbotService,
     SendWelcomeMenuViaWhatsAppService,
     SelectAppointmentMonthViaWhatsAppService,
-    SelectAppointmentWeekViaWhatsAppService,
+    SelectAppointmentDayViaWhatsAppService,
   ],
   exports: [WhatsAppChatbotService],
 })

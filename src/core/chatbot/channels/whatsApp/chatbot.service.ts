@@ -1,11 +1,11 @@
 import {
+  SelectAppointmentDayViaWhatsAppService,
   SelectAppointmentMonthViaWhatsAppService,
-  SelectAppointmentWeekViaWhatsAppService,
   SendWelcomeMenuViaWhatsAppService,
 } from '@core/chatbot/flows/whatsApp';
 import { GetLocaleI18nForWhatsAppService } from '@core/i18n/channels/whatsApp';
 import { Injectable } from '@nestjs/common';
-import { CACHE, LOCALES, STARTS_WITH } from '@shared/constants';
+import { CACHE, LOCALES } from '@shared/constants';
 import { IButtonStructure } from '@shared/interfaces';
 import { IUnifiedMessage } from '@shared/interfaces';
 import { GetStateInSessionService } from '@shared/redis/session';
@@ -15,7 +15,7 @@ export class WhatsAppChatbotService {
   constructor(
     private readonly sendWelcomeMenuViaWhatsAppService: SendWelcomeMenuViaWhatsAppService,
     private readonly selectAppointmentMonthViaWhatsAppService: SelectAppointmentMonthViaWhatsAppService,
-    private readonly selectAppointmentWeekViaWhatsAppService: SelectAppointmentWeekViaWhatsAppService,
+    private readonly selectAppointmentDayViaWhatsAppService: SelectAppointmentDayViaWhatsAppService,
     private readonly getStateInSession: GetStateInSessionService,
     private readonly getLocaleI18nForWhatsAppService: GetLocaleI18nForWhatsAppService,
   ) {}
@@ -41,12 +41,13 @@ export class WhatsAppChatbotService {
         return this.handleMenuSelection(replyId, senderPhoneNumber, buttons);
 
       case CACHE.SELECTED_MONTH:
-      case CACHE.SELECTED_WEEK:
-        if (replyId?.startsWith(STARTS_WITH.MONTH)) {
-          return this.selectAppointmentWeekViaWhatsAppService.execute(
-            senderPhoneNumber,
-          );
-        }
+        return this.selectAppointmentDayViaWhatsAppService.execute(
+          senderPhoneNumber,
+          replyId,
+        );
+
+      case CACHE.SELECTED_DAY:
+        return;
     }
   }
 

@@ -1,28 +1,9 @@
-import { STARTS_WITH } from '@shared/constants';
-import {
-  IMonthYear,
-  INormalizedEvent,
-  IRowStructure,
-} from '@shared/interfaces';
+import env from '@config/env';
+import { IDateRange, INormalizedEvent } from '@shared/interfaces';
+import { calendar_v3 } from 'googleapis';
 import { DateTime } from 'luxon';
 
-import { toBrazilDate } from './date.helper';
-
-export const filterMonthRowsFromLocale = (
-  allMonthRows: Array<{ id: string; title: string }>,
-  availableMonths: IMonthYear[],
-): IRowStructure[] => {
-  return availableMonths.map((item) => {
-    const row = allMonthRows.find(
-      (row) => row.id === `${STARTS_WITH.MONTH}${item.month}`,
-    );
-
-    return {
-      ...row,
-      description: item.year.toString(),
-    };
-  });
-};
+import { nowInBrazil, toBrazilDate } from './date.helper';
 
 export function checkIntervalsOverlap(
   startA: DateTime,
@@ -33,7 +14,7 @@ export function checkIntervalsOverlap(
   return startA < endB && endA > startB;
 }
 
-export function getWorkdayIntervals(day: DateTime) {
+export function getWorkdayIntervals(day: DateTime): IDateRange[] {
   return [
     {
       start: day.set({ hour: 8, minute: 0 }),
@@ -62,10 +43,68 @@ export function checkIfThereIsAvailability(
       return { start: event.start, end: toBrazilDate(event.raw.end.dateTime) };
     });
 
-  return workIntervals.some((work) => {
-    const isBlocked = eventIntervals.some((event) =>
-      checkIntervalsOverlap(work.start, work.end, event.start, event.end),
-    );
-    return !isBlocked;
+  for (const workInterval of workIntervals) {
+    let freeBlocks: IDateRange[] = [
+      { start: workInterval.start, end: workInterval.end },
+    ];
+
+    for (const event of eventIntervals) {
+      freeBlocks = freeBlocks.flatMap((free) => {
+        if (
+          !checkIntervalsOverlap(free.start, free.end, event.start, event.end)
+        ) {
+          return [free];
+        }
+
+        const result = [];
+
+        if (event.start > free.start) {
+          result.push({ start: free.start, end: event.start });
+        }
+
+        if (event.end < free.end) {
+          result.push({ start: event.end, end: free.end });
+        }
+
+        return result;
+      });
+    }
+
+    const hasOneHour = freeBlocks.some((block) => {
+      const diff = block.end.diff(block.start, 'minutes').minutes;
+      return diff >= env().business.consultationDuration;
+    });
+
+    if (hasOneHour) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+export function normalizeEvents(
+  events: calendar_v3.Schema$Event[],
+): INormalizedEvent[] {
+  const validEvents = events.filter(
+    (event) => event.start?.dateTime || event.start?.date,
+  );
+
+  const mappedEvents = validEvents.map((event) => {
+    const start = event.start.dateTime
+      ? toBrazilDate(event.start.dateTime)
+      : DateTime.fromISO(event.start.date).set({ hour: 0 });
+
+    return {
+      raw: event,
+      start,
+      isAllDay: Boolean(event.start.date),
+    };
   });
+
+  const futureEvents = mappedEvents.filter(
+    (event) => event.start >= nowInBrazil(),
+  );
+
+  return futureEvents;
 }

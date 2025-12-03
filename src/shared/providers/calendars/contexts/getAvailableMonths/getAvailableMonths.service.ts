@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { CALENDAR_PARAMETER } from '@shared/constants';
 import {
   checkIfThereIsAvailability,
+  normalizeEvents,
   nowInBrazil,
-  toBrazilDate,
+  startDay,
 } from '@shared/helpers';
 import { IMonthYear, INormalizedEvent } from '@shared/interfaces';
-import { calendar_v3 } from 'googleapis';
 import { DateTime } from 'luxon';
 
 import { ListEventsInCalendarService } from '../listEvents';
@@ -21,7 +21,7 @@ export class GetAvailableMonthsInCalendarService {
     const nowISO = new Date().toISOString();
     const { data } = await this.listEventsService.execute(calendarId, nowISO);
     const events = data.items ?? [];
-    const normalizedEvents = this.normalizeEvents(events);
+    const normalizedEvents = normalizeEvents(events);
 
     const currentDate = nowInBrazil();
     const availableMonths: IMonthYear[] = [];
@@ -62,11 +62,7 @@ export class GetAvailableMonthsInCalendarService {
     monthDate: DateTime,
     events: INormalizedEvent[],
   ): Promise<boolean> {
-    const startDay = monthDate.hasSame(nowInBrazil(), 'month')
-      ? nowInBrazil().day
-      : 1;
-
-    for (let day = startDay; day <= monthDate.daysInMonth; day++) {
+    for (let day = startDay(monthDate); day <= monthDate.daysInMonth; day++) {
       const dayDate = monthDate.set({ day });
 
       const dayEvents = events.filter(
@@ -81,31 +77,5 @@ export class GetAvailableMonthsInCalendarService {
     }
 
     return false;
-  }
-
-  private normalizeEvents(
-    events: calendar_v3.Schema$Event[],
-  ): INormalizedEvent[] {
-    const validEvents = events.filter(
-      (event) => event.start?.dateTime || event.start?.date,
-    );
-
-    const mappedEvents = validEvents.map((event) => {
-      const start = event.start.dateTime
-        ? toBrazilDate(event.start.dateTime)
-        : DateTime.fromISO(event.start.date).set({ hour: 0 });
-
-      return {
-        raw: event,
-        start,
-        isAllDay: Boolean(event.start.date),
-      };
-    });
-
-    const futureEvents = mappedEvents.filter(
-      (event) => event.start >= nowInBrazil(),
-    );
-
-    return futureEvents;
   }
 }

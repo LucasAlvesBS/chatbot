@@ -10,40 +10,43 @@
   "flow": {
     "schedulingStarted": {
       "monthSelection": {
-        "message": "Perfeito! 😊\n\nVamos iniciar seu *agendamento de consulta médica*.\n\nPara continuarmos, por favor selecione o **mês** em que deseja realizar sua consulta.",
-        "buttonLabel": "Selecionar mês",
-        "section": {
-          "title": "Meses disponíveis",
-          "rows": [
-            { "id": "month_01", "title": "Janeiro" },
-            { "id": "month_02", "title": "Fevereiro" },
-            { "id": "month_03", "title": "Março" },
-            { "id": "month_04", "title": "Abril" },
-            { "id": "month_05", "title": "Maio" },
-            { "id": "month_06", "title": "Junho" },
-            { "id": "month_07", "title": "Julho" },
-            { "id": "month_08", "title": "Agosto" },
-            { "id": "month_09", "title": "Setembro" },
-            { "id": "month_10", "title": "Outubro" },
-            { "id": "month_11", "title": "Novembro" },
-            { "id": "month_12", "title": "Dezembro" }
-          ]
-        }
+        "message": "Perfeito! 😊\n\nVamos iniciar seu *agendamento de consulta médica*.\n\nPara continuarmos, por favor selecione o *mês* em que deseja realizar sua consulta."
       },
-      "weekSelection" : {
-        "message": "Perfeito! 😊\n\nVamos iniciar seu *agendamento de consulta médica*.\n\nPara continuarmos, por favor selecione a **semana** em que deseja realizar sua consulta.",
-        "buttonLabel": "Selecionar semana",
-        "section": {
-          "title": "Semanas disponíveis",
-          "rows": [
-            { "id": "week_01", "title": "Primeira semana" },
-            { "id": "week_02", "title": "Segunda semana" },
-            { "id": "week_03", "title": "Terceira semana" },
-            { "id": "week_04", "title": "Quarta semana" },
-            { "id": "week_05", "title": "Quinta semana" },
-            { "id": "week_06", "title": "Sexta semana" }
-          ]
-        }
+      "daySelection" : {
+        "message": "Agora, por favor, selecione o *dia* em que deseja realizar sua consulta."
+      }
+    }
+  },
+  "list": {
+    "month": {
+      "buttonLabel": "Selecionar mês",
+      "section": {
+        "title": "Meses disponíveis",
+        "rows": [
+          { "id": "month_01", "title": "Janeiro" },
+          { "id": "month_02", "title": "Fevereiro" },
+          { "id": "month_03", "title": "Março" },
+          { "id": "month_04", "title": "Abril" },
+          { "id": "month_05", "title": "Maio" },
+          { "id": "month_06", "title": "Junho" },
+          { "id": "month_07", "title": "Julho" },
+          { "id": "month_08", "title": "Agosto" },
+          { "id": "month_09", "title": "Setembro" },
+          { "id": "month_10", "title": "Outubro" },
+          { "id": "month_11", "title": "Novembro" },
+          { "id": "month_12", "title": "Dezembro" }
+        ]
+      }
+    },
+    "day": {
+      "buttonLabel": "Selecionar dia",
+      "section": {
+        "title": "Dias disponíveis",
+        "rows": [
+          { "id": "day_more", "title": "Ver dias seguintes" },
+          { "id": "day_prev", "title": "Ver dias anteriores" },
+          { "id": "day_month", "title": "Escolher mês" }
+        ]
       }
     }
   }

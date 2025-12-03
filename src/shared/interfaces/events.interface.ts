@@ -11,3 +11,8 @@ export interface IMonthYear {
   month: string;
   year: number;
 }
+
+export interface IWeekday {
+  day: number;
+  weekday: string;
+}
