@@ -1,59 +1,38 @@
 import env from '@config/env';
-import { GetLocaleI18nForWhatsAppService } from '@core/i18n/channels/whatsApp';
+import { I18nTranslations } from '@core/i18n/generated';
 import { Injectable } from '@nestjs/common';
-import {
-  CACHE,
-  LOCALES,
-  STARTS_WITH,
-  WHATSAPP_PARAMETER,
-} from '@shared/constants';
+import { CACHE, STARTS_WITH, WHATSAPP_PARAMETER } from '@shared/constants';
+import { Languages } from '@shared/enums';
 import { IRowStructure, IWeekday } from '@shared/interfaces';
 import { GetAvailableDaysInCalendarService } from '@shared/providers/calendars';
 import { SendInteractiveListsMessageService } from '@shared/providers/whatsApp';
 import { SetStateInSessionService } from '@shared/redis/session';
 import { formatPadStart } from '@shared/utils';
+import { I18nService } from 'nestjs-i18n';
 
 import { SelectAppointmentMonthViaWhatsAppService } from '../selectAppointmentMonth';
 
 @Injectable()
 export class SelectAppointmentDayViaWhatsAppService {
   constructor(
+    private readonly i18nService: I18nService<I18nTranslations>,
     private readonly sendInteractiveListsMessageService: SendInteractiveListsMessageService,
     private readonly selectAppointmentMonthViaWhatsAppService: SelectAppointmentMonthViaWhatsAppService,
     private readonly setStateInSession: SetStateInSessionService,
-    private readonly getLocaleI18nForWhatsAppService: GetLocaleI18nForWhatsAppService,
     private readonly getAvailableDaysInCalendarService: GetAvailableDaysInCalendarService,
   ) {}
 
-  async execute(phoneNumber: string, replyId: string): Promise<void> {
-    const {
-      flow: {
-        schedulingStarted: {
-          daySelection: { message },
-        },
-      },
-      list: {
-        day: { buttonLabel, section },
-      },
-    } = this.getLocaleI18nForWhatsAppService.execute(LOCALES.PT_BR);
-
-    const { title: sectionTitle, rows } = section;
-
-    const rowTemplateMap = new Map(rows.map((row) => [row.id, row]));
-
+  async execute(
+    phoneNumber: string,
+    replyId: string,
+    lang: Languages,
+  ): Promise<void> {
+    console.log(replyId);
     if (replyId.startsWith(STARTS_WITH.MONTH)) {
       const monthYearByUnderline = replyId.replace(STARTS_WITH.MONTH, '');
       const [month, year] = monthYearByUnderline.split('_');
 
-      return this.selectDaysForMessage(
-        phoneNumber,
-        month,
-        year,
-        message,
-        buttonLabel,
-        sectionTitle,
-        rowTemplateMap,
-      );
+      return this.selectDaysForMessage(phoneNumber, month, year, lang);
     }
 
     if (replyId.startsWith(STARTS_WITH.DAY_MORE)) {
@@ -63,10 +42,7 @@ export class SelectAppointmentDayViaWhatsAppService {
         phoneNumber,
         month,
         year,
-        message,
-        buttonLabel,
-        sectionTitle,
-        rowTemplateMap,
+        lang,
         pageToken,
       );
     }
@@ -78,15 +54,14 @@ export class SelectAppointmentDayViaWhatsAppService {
         phoneNumber,
         month,
         year,
-        message,
-        buttonLabel,
-        sectionTitle,
-        rowTemplateMap,
+        lang,
         pageToken,
       );
     }
 
-    if (replyId === rowTemplateMap.get(STARTS_WITH.DAY_MONTH).id) {
+    const dayMonth = this.getDefaultRow(lang, 2);
+
+    if (replyId === dayMonth.id) {
       return this.selectAppointmentMonthViaWhatsAppService.execute(phoneNumber);
     }
 
@@ -99,23 +74,11 @@ export class SelectAppointmentDayViaWhatsAppService {
     availableDays: IWeekday[],
     month: string,
     year: string,
-    rowTemplateMap: Map<string, IRowStructure>,
+    lang: Languages,
     page = 1,
   ): IRowStructure[] {
     const pageSize = WHATSAPP_PARAMETER.PAGE_SIZE_FOR_DAYS;
     const total = availableDays.length;
-
-    const { id: startsWithDayMoreId, title: dayMoreTitle } = rowTemplateMap.get(
-      STARTS_WITH.DAY_MORE,
-    );
-
-    const { id: startsWithDayPrevId, title: dayPrevTitle } = rowTemplateMap.get(
-      STARTS_WITH.DAY_PREV,
-    );
-
-    const { id: dayMonthId, title: dayMonthTitle } = rowTemplateMap.get(
-      STARTS_WITH.DAY_MONTH,
-    );
 
     const pages: IWeekday[][] = [];
     let cursor = 0;
@@ -139,9 +102,14 @@ export class SelectAppointmentDayViaWhatsAppService {
     const rows: IRowStructure[] = pageItems.map((item) => {
       const formattedDay = formatPadStart(item.day);
 
+      const row = this.i18nService.t('lists.day.section.rowTemplate', {
+        lang,
+        args: { day: formattedDay, month: formattedMonth, year },
+      });
+
       return {
-        id: `day_${formattedDay}_${formattedMonth}_${year}`,
-        title: `${formattedDay}/${formattedMonth}/${year}`,
+        id: row.id,
+        title: row.title,
         description: item.weekday,
       };
     });
@@ -150,30 +118,50 @@ export class SelectAppointmentDayViaWhatsAppService {
     const isLast = page === totalPages;
 
     if (!isFirst) {
-      const prevPage = page - 1;
-      const dayPrevId = `${startsWithDayPrevId}_${formattedMonth}_${year}_p${prevPage}`;
-      rows.push({ id: dayPrevId, title: dayPrevTitle });
+      const dayPrev = this.getDefaultRow(lang, 1, {
+        month: formattedMonth,
+        year,
+        page: String(page - 1),
+      });
+
+      rows.push({ id: dayPrev.id, title: dayPrev.title });
     }
 
     if (!isLast) {
-      const nextPage = page + 1;
-      const dayMoreId = `${startsWithDayMoreId}_${formattedMonth}_${year}_p${nextPage}`;
-      rows.push({ id: dayMoreId, title: dayMoreTitle });
+      const dayMore = this.getDefaultRow(lang, 0, {
+        month: formattedMonth,
+        year,
+        page: String(page + 1),
+      });
+
+      rows.push({ id: dayMore.id, title: dayMore.title });
     }
 
-    rows.push({ id: dayMonthId, title: dayMonthTitle });
+    const dayMonth = this.getDefaultRow(lang, 2);
+
+    rows.push({ id: dayMonth.id, title: dayMonth.title });
 
     return rows;
+  }
+
+  private getDefaultRow(
+    lang: Languages,
+    index: number,
+    args?: Record<string, string>,
+  ) {
+    const rows = this.i18nService.t('lists.day.section.defaultRows', {
+      lang,
+      ...(args ? { args } : {}),
+    });
+
+    return rows[index];
   }
 
   private async selectDaysForMessage(
     phoneNumber: string,
     month: string,
     year: string,
-    message: string,
-    buttonLabel: string,
-    sectionTitle: string,
-    rowTemplateMap: Map<string, IRowStructure>,
+    lang: Languages,
     pageToken?: string,
   ) {
     const page = pageToken ? Number(pageToken.replace('p', '')) : 1;
@@ -188,9 +176,22 @@ export class SelectAppointmentDayViaWhatsAppService {
       availableDays,
       month,
       year,
-      rowTemplateMap,
+      lang,
       page,
     );
+
+    const message = this.i18nService.t(
+      'messages.flow.schedulingStarted.daySelection',
+      { lang },
+    );
+
+    const buttonLabel = this.i18nService.t('lists.day.buttonLabel', {
+      lang,
+    });
+
+    const sectionTitle = this.i18nService.t('lists.day.section.title', {
+      lang,
+    });
 
     await this.sendInteractiveListsMessageService.execute({
       to: phoneNumber,

@@ -1,34 +1,24 @@
 import env from '@config/env';
-import { GetLocaleI18nForWhatsAppService } from '@core/i18n/channels/whatsApp';
+import { I18nTranslations } from '@core/i18n/generated';
 import { Injectable } from '@nestjs/common';
-import { CACHE, LOCALES, STARTS_WITH } from '@shared/constants';
-import { IMonthYear, IRowStructure } from '@shared/interfaces';
+import { CACHE } from '@shared/constants';
+import { IMonthYear } from '@shared/interfaces';
 import { GetAvailableMonthsInCalendarService } from '@shared/providers/calendars';
 import { SendInteractiveListsMessageService } from '@shared/providers/whatsApp';
 import { SetStateInSessionService } from '@shared/redis/session';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class SelectAppointmentMonthViaWhatsAppService {
   constructor(
+    private readonly i18nService: I18nService<I18nTranslations>,
     private readonly sendInteractiveListsMessageService: SendInteractiveListsMessageService,
     private readonly setStateInSession: SetStateInSessionService,
-    private readonly getLocaleI18nForWhatsAppService: GetLocaleI18nForWhatsAppService,
     private readonly getAvailableMonthsInCalendarService: GetAvailableMonthsInCalendarService,
   ) {}
 
   async execute(phoneNumber: string): Promise<void> {
-    const {
-      flow: {
-        schedulingStarted: {
-          monthSelection: { message },
-        },
-      },
-      list: {
-        month: { buttonLabel, section },
-      },
-    } = this.getLocaleI18nForWhatsAppService.execute(LOCALES.PT_BR);
-
-    const allMonthRows = section.rows;
+    const allMonths = this.i18nService.t('lists.month');
 
     const availableMonths =
       await this.getAvailableMonthsInCalendarService.execute(
@@ -36,17 +26,21 @@ export class SelectAppointmentMonthViaWhatsAppService {
       );
 
     const filteredMonthRows = this.filterRowsFromAvailableMonths(
-      allMonthRows,
+      allMonths.section.rows,
       availableMonths,
+    );
+
+    const message = this.i18nService.t(
+      'messages.flow.schedulingStarted.monthSelection',
     );
 
     await this.sendInteractiveListsMessageService.execute({
       to: phoneNumber,
       message,
-      buttonLabel,
+      buttonLabel: allMonths.buttonLabel,
       sections: [
         {
-          title: section.title,
+          title: allMonths.section.title,
           rows: filteredMonthRows,
         },
       ],
@@ -58,11 +52,9 @@ export class SelectAppointmentMonthViaWhatsAppService {
   private filterRowsFromAvailableMonths(
     allMonthRows: Array<{ id: string; title: string }>,
     availableMonths: IMonthYear[],
-  ): IRowStructure[] {
+  ) {
     return availableMonths.map((item) => {
-      const row = allMonthRows.find(
-        (row) => row.id === `${STARTS_WITH.MONTH}${item.month}`,
-      );
+      const row = allMonthRows[Number(item.month) - 1];
 
       return {
         ...row,

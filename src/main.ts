@@ -4,7 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { SecuritySchemeObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import { VERSIONS } from '@shared/constants';
-import { Envs } from '@shared/enums/envs.enum';
+import { Envs } from '@shared/enums';
 
 import { AppModule } from './app.module';
 

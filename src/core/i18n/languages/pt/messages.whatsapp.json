@@ -1,0 +1,9 @@
+{
+  "welcome": "Olá! 👋\n\nSou o *Assistente Virtual* 🩺\nEstou aqui para lhe ajudar com seu atendimento.\n\nComo posso ajudar hoje?",
+  "flow": {
+    "schedulingStarted": {
+      "monthSelection": "Perfeito! 😊\n\nVamos iniciar seu *agendamento de consulta médica*.\n\nPor favor selecione o mês.",   
+      "daySelection": "Agora selecione o dia da consulta."
+    }
+  }
+}
