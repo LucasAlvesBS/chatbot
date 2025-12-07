@@ -1,4 +1,4 @@
-export * from './selectAppointmentDay';
-export * from './selectAppointmentHour';
-export * from './selectAppointmentMonth';
+export * from './selectDay';
+export * from './selectHour';
+export * from './selectMonth';
 export * from './sendWelcomeMenu';

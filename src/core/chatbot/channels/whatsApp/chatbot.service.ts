@@ -1,7 +1,7 @@
 import {
-  SelectAppointmentDayViaWhatsAppService,
-  SelectAppointmentHourViaWhatsAppService,
-  SelectAppointmentMonthViaWhatsAppService,
+  SelectDayViaWhatsAppService,
+  SelectHourViaWhatsAppService,
+  SelectMonthViaWhatsAppService,
   SendWelcomeMenuViaWhatsAppService,
 } from '@core/chatbot/flows/whatsApp';
 import { I18nTranslations } from '@core/i18n/generated';
@@ -17,9 +17,9 @@ export class WhatsAppChatbotService {
   constructor(
     private readonly i18nService: I18nService<I18nTranslations>,
     private readonly sendWelcomeMenuViaWhatsAppService: SendWelcomeMenuViaWhatsAppService,
-    private readonly selectAppointmentDayViaWhatsAppService: SelectAppointmentDayViaWhatsAppService,
-    private readonly selectAppointmentHourViaWhatsAppService: SelectAppointmentHourViaWhatsAppService,
-    private readonly selectAppointmentMonthViaWhatsAppService: SelectAppointmentMonthViaWhatsAppService,
+    private readonly selectDayViaWhatsAppService: SelectDayViaWhatsAppService,
+    private readonly selectHourViaWhatsAppService: SelectHourViaWhatsAppService,
+    private readonly selectMonthViaWhatsAppService: SelectMonthViaWhatsAppService,
     private readonly getStateInSession: GetStateInSessionService,
   ) {}
 
@@ -37,14 +37,14 @@ export class WhatsAppChatbotService {
         return this.handleMenuSelection(replyId, senderPhoneNumber, lang);
 
       case CACHE.SELECTED_MONTH:
-        return this.selectAppointmentDayViaWhatsAppService.execute(
+        return this.selectDayViaWhatsAppService.execute(
           senderPhoneNumber,
           replyId,
           lang,
         );
 
       case CACHE.SELECTED_DAY:
-        return this.selectAppointmentHourViaWhatsAppService.execute(
+        return this.selectHourViaWhatsAppService.execute(
           senderPhoneNumber,
           replyId,
           lang,
@@ -68,10 +68,7 @@ export class WhatsAppChatbotService {
 
     switch (replyId) {
       case scheduling:
-        return this.selectAppointmentMonthViaWhatsAppService.execute(
-          phoneNumber,
-          lang,
-        );
+        return this.selectMonthViaWhatsAppService.execute(phoneNumber, lang);
 
       case cancellation:
         console.log('flow_cancellation_started');

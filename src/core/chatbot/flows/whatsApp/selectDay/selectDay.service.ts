@@ -12,16 +12,16 @@ import { SetStateInSessionService } from '@shared/redis/session';
 import { formatPadStart } from '@shared/utils';
 import { I18nService } from 'nestjs-i18n';
 
-import { SelectAppointmentHourViaWhatsAppService } from '../selectAppointmentHour';
-import { SelectAppointmentMonthViaWhatsAppService } from '../selectAppointmentMonth';
+import { SelectHourViaWhatsAppService } from '../selectHour';
+import { SelectMonthViaWhatsAppService } from '../selectMonth';
 
 @Injectable()
-export class SelectAppointmentDayViaWhatsAppService {
+export class SelectDayViaWhatsAppService {
   constructor(
     private readonly i18nService: I18nService<I18nTranslations>,
     private readonly sendInteractiveListsMessageService: SendInteractiveListsMessageService,
-    private readonly selectAppointmentMonthViaWhatsAppService: SelectAppointmentMonthViaWhatsAppService,
-    private readonly selectAppointmenHourViaWhatsAppService: SelectAppointmentHourViaWhatsAppService,
+    private readonly selectMonthViaWhatsAppService: SelectMonthViaWhatsAppService,
+    private readonly selectHourViaWhatsAppService: SelectHourViaWhatsAppService,
     private readonly setStateInSession: SetStateInSessionService,
     private readonly getAvailableDaysInCalendarService: GetAvailableDaysInCalendarService,
   ) {}
@@ -68,16 +68,13 @@ export class SelectAppointmentDayViaWhatsAppService {
     const dayMonth = this.i18nService.t(defaultRowsPath, { lang })[2];
 
     if (replyId === dayMonth.id) {
-      return this.selectAppointmentMonthViaWhatsAppService.execute(
-        phoneNumber,
-        lang,
-      );
+      return this.selectMonthViaWhatsAppService.execute(phoneNumber, lang);
     }
 
     if (replyId.startsWith(REPLY_IDS.DAY)) {
       await this.setStateInSession.execute(phoneNumber, CACHE.SELECTED_DAY);
 
-      return this.selectAppointmenHourViaWhatsAppService.execute(
+      return this.selectHourViaWhatsAppService.execute(
         phoneNumber,
         replyId,
         lang,

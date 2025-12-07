@@ -11,17 +11,17 @@ import { SetStateInSessionService } from '@shared/redis/session';
 import { formatPadStart } from '@shared/utils';
 import { I18nService } from 'nestjs-i18n';
 
-import { SelectAppointmentDayViaWhatsAppService } from '../selectAppointmentDay';
+import { SelectDayViaWhatsAppService } from '../selectDay';
 
 @Injectable()
-export class SelectAppointmentHourViaWhatsAppService {
+export class SelectHourViaWhatsAppService {
   constructor(
     private readonly i18nService: I18nService<I18nTranslations>,
     private readonly sendList: SendInteractiveListsMessageService,
     private readonly getAvailableHoursInCalendarService: GetAvailableHoursInCalendarService,
     private readonly setState: SetStateInSessionService,
-    @Inject(forwardRef(() => SelectAppointmentDayViaWhatsAppService))
-    private readonly selectAppointmentDayViaWhatsAppService: SelectAppointmentDayViaWhatsAppService,
+    @Inject(forwardRef(() => SelectDayViaWhatsAppService))
+    private readonly selectDayViaWhatsAppService: SelectDayViaWhatsAppService,
   ) {}
 
   async execute(phoneNumber: string, replyId: string, lang: Languages) {
@@ -41,7 +41,7 @@ export class SelectAppointmentHourViaWhatsAppService {
     }
 
     if (replyId.startsWith(REPLY_IDS.MONTH)) {
-      return this.selectAppointmentDayViaWhatsAppService.execute(
+      return this.selectDayViaWhatsAppService.execute(
         phoneNumber,
         replyId,
         lang,

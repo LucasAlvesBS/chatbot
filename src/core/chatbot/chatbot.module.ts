@@ -8,9 +8,9 @@ import { SessionModule } from '@shared/redis';
 
 import { WhatsAppChatbotService } from './channels/whatsApp';
 import {
-  SelectAppointmentDayViaWhatsAppService,
-  SelectAppointmentHourViaWhatsAppService,
-  SelectAppointmentMonthViaWhatsAppService,
+  SelectDayViaWhatsAppService,
+  SelectHourViaWhatsAppService,
+  SelectMonthViaWhatsAppService,
   SendWelcomeMenuViaWhatsAppService,
 } from './flows/whatsApp';
 
@@ -24,9 +24,9 @@ import {
   providers: [
     WhatsAppChatbotService,
     SendWelcomeMenuViaWhatsAppService,
-    SelectAppointmentDayViaWhatsAppService,
-    SelectAppointmentHourViaWhatsAppService,
-    SelectAppointmentMonthViaWhatsAppService,
+    SelectDayViaWhatsAppService,
+    SelectHourViaWhatsAppService,
+    SelectMonthViaWhatsAppService,
   ],
   exports: [WhatsAppChatbotService],
 })

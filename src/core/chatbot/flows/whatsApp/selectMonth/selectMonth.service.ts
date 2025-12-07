@@ -10,7 +10,7 @@ import { SetStateInSessionService } from '@shared/redis/session';
 import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
-export class SelectAppointmentMonthViaWhatsAppService {
+export class SelectMonthViaWhatsAppService {
   constructor(
     private readonly i18nService: I18nService<I18nTranslations>,
     private readonly sendInteractiveListsMessageService: SendInteractiveListsMessageService,
