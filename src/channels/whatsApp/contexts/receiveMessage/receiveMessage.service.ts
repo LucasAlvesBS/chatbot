@@ -1,7 +1,6 @@
 import env from '@config/env';
 import { WhatsAppChatbotService } from '@core/chatbot/channels/whatsApp';
 import { Injectable } from '@nestjs/common';
-import { Channels } from '@shared/enums';
 
 import { ReceiveWhatsAppMessageRequestDTO } from './dtos';
 
@@ -26,7 +25,6 @@ export class ReceiveWhatsAppMessageService {
     if (from !== env().whatsApp.phoneNumber) return;
 
     await this.service.execute({
-      channel: Channels.WHATSAPP,
       senderPhoneNumber: from,
       message: text,
       ...(replyId && { replyId }),

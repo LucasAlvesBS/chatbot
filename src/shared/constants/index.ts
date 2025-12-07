@@ -8,7 +8,7 @@ export * from './parameters.constant';
 export * from './paths.constant';
 export * from './providers.constant';
 export * from './queueNames.constant';
-export * from './startsWith.constant';
+export * from './replies.constant';
 export * from './timezone.constant';
 export * from './versions.contant';
 export * from './webhooks.constant';

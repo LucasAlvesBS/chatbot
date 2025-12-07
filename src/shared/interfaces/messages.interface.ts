@@ -1,9 +1,6 @@
-import { Channels } from '@shared/enums';
-
 export interface IUnifiedMessage {
-  channel: Channels;
   senderPhoneNumber: string;
-  message: string;
+  message?: string;
   replyId?: string;
 }
 

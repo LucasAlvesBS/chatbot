@@ -27,60 +27,75 @@ export function getWorkdayIntervals(day: DateTime): IDateRange[] {
   ];
 }
 
-export function checkIfThereIsAvailability(
+export function getEventsForDay(
+  date: DateTime,
+  events: INormalizedEvent[],
+): INormalizedEvent[] {
+  return events.filter((event) => event.start.hasSame(date, 'day'));
+}
+
+export function getFreeBlocksInDay(
   day: DateTime,
-  normlizedEvents: INormalizedEvent[],
-): boolean {
+  events: INormalizedEvent[],
+): IDateRange[] {
+  const filteredEvents = getEventsForDay(day, events);
   const workIntervals = getWorkdayIntervals(day);
 
-  if (normlizedEvents.some((event) => event.isAllDay)) {
-    return false;
+  if (filteredEvents.some((event) => event.isAllDay)) {
+    return [];
   }
 
-  const eventIntervals = normlizedEvents
+  const eventIntervals = filteredEvents
     .filter((event) => !event.isAllDay && event.raw.end?.dateTime)
     .map((event) => {
       return { start: event.start, end: toBrazilDate(event.raw.end.dateTime) };
     });
 
+  const freeBlocks: IDateRange[] = [];
+
   for (const workInterval of workIntervals) {
-    let freeBlocks: IDateRange[] = [
+    let blocks: IDateRange[] = [
       { start: workInterval.start, end: workInterval.end },
     ];
 
     for (const event of eventIntervals) {
-      freeBlocks = freeBlocks.flatMap((free) => {
+      blocks = blocks.flatMap((block) => {
         if (
-          !checkIntervalsOverlap(free.start, free.end, event.start, event.end)
+          !checkIntervalsOverlap(block.start, block.end, event.start, event.end)
         ) {
-          return [free];
+          return [block];
         }
 
         const result = [];
 
-        if (event.start > free.start) {
-          result.push({ start: free.start, end: event.start });
+        if (event.start > block.start) {
+          result.push({ start: block.start, end: event.start });
         }
 
-        if (event.end < free.end) {
-          result.push({ start: event.end, end: free.end });
+        if (event.end < block.end) {
+          result.push({ start: event.end, end: block.end });
         }
 
         return result;
       });
     }
 
-    const hasOneHour = freeBlocks.some((block) => {
-      const diff = block.end.diff(block.start, 'minutes').minutes;
-      return diff >= env().business.consultationDuration;
-    });
-
-    if (hasOneHour) {
-      return true;
-    }
+    freeBlocks.push(...blocks);
   }
 
-  return false;
+  return freeBlocks;
+}
+
+export function checkIfThereIsAvailability(
+  day: DateTime,
+  events: INormalizedEvent[],
+): boolean {
+  const freeBlocks = getFreeBlocksInDay(day, events);
+
+  return freeBlocks.some((block) => {
+    const diff = block.end.diff(block.start, 'minutes').minutes;
+    return diff >= env().business.consultationDuration;
+  });
 }
 
 export function normalizeEvents(

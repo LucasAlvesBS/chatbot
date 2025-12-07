@@ -28,9 +28,36 @@
         "title": "{day}/{month}/{year}"
       },
       "defaultRows": [
-        { "id": "day_more_{month}_{year}_p{page}", "title": "Ver dias seguintes" },
-        { "id": "day_prev_{month}_{year}_p{page}", "title": "Ver dias anteriores" },
-        { "id": "day_month", "title": "Escolher mês" }
+        {
+          "id": "day_more_{month}_{year}_p{page}",
+          "title": "Ver dias seguintes"
+        },
+        {
+          "id": "day_prev_{month}_{year}_p{page}",
+          "title": "Ver dias anteriores"
+        },
+        { "id": "day_month", "title": "Escolher outro mês" }
+      ]
+    }
+  },
+  "hour": {
+    "buttonLabel": "Selecionar hora",
+    "section": {
+      "title": "Horas disponíveis",
+      "rowTemplate": {
+        "id": "hour_{hour}_{minute}_{day}_{month}_{year}",
+        "title": "{hour}:{minute}"
+      },
+      "defaultRows": [
+        {
+          "id": "hour_more_{day}_{month}_{year}_p{page}",
+          "title": "Ver horas seguintes"
+        },
+        {
+          "id": "hour_prev_{day}_{month}_{year}_p{page}",
+          "title": "Ver horas anteriores"
+        },
+        { "id": "month_{month}_{year}", "title": "Escolher outro dia" }
       ]
     }
   }

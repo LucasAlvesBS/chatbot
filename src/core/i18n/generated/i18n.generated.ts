@@ -102,6 +102,30 @@ export type I18nTranslations = {
                 ];
             };
         };
+        "hour": {
+            "buttonLabel": string;
+            "section": {
+                "title": string;
+                "rowTemplate": {
+                    "id": string;
+                    "title": string;
+                };
+                "defaultRows": [
+                    {
+                        "id": string;
+                        "title": string;
+                    },
+                    {
+                        "id": string;
+                        "title": string;
+                    },
+                    {
+                        "id": string;
+                        "title": string;
+                    }
+                ];
+            };
+        };
     };
     "messages": {
         "welcome": string;
@@ -109,6 +133,7 @@ export type I18nTranslations = {
             "schedulingStarted": {
                 "monthSelection": string;
                 "daySelection": string;
+                "hourSelection": string;
             };
         };
     };

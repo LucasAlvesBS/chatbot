@@ -2,6 +2,7 @@ import env from '@config/env';
 import { I18nTranslations } from '@core/i18n/generated';
 import { Injectable } from '@nestjs/common';
 import { CACHE } from '@shared/constants';
+import { Languages } from '@shared/enums';
 import { IMonthYear } from '@shared/interfaces';
 import { GetAvailableMonthsInCalendarService } from '@shared/providers/calendars';
 import { SendInteractiveListsMessageService } from '@shared/providers/whatsApp';
@@ -17,12 +18,13 @@ export class SelectAppointmentMonthViaWhatsAppService {
     private readonly getAvailableMonthsInCalendarService: GetAvailableMonthsInCalendarService,
   ) {}
 
-  async execute(phoneNumber: string): Promise<void> {
+  async execute(phoneNumber: string, lang: Languages): Promise<void> {
     const allMonths = this.i18nService.t('lists.month');
 
     const availableMonths =
       await this.getAvailableMonthsInCalendarService.execute(
         env().google.calendarId,
+        lang,
       );
 
     const filteredMonthRows = this.filterRowsFromAvailableMonths(
@@ -32,6 +34,7 @@ export class SelectAppointmentMonthViaWhatsAppService {
 
     const message = this.i18nService.t(
       'messages.flow.schedulingStarted.monthSelection',
+      { lang },
     );
 
     await this.sendInteractiveListsMessageService.execute({

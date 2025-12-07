@@ -1,3 +1,5 @@
+import { Languages } from '@shared/enums';
+
 export const LOCALES = {
-  PT_BR: 'pt-BR',
-} as const;
+  [Languages.PT]: 'pt-BR',
+};

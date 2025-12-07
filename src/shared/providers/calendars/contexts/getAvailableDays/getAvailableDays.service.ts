@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { CALENDAR_PARAMETER, LOCALES } from '@shared/constants';
+import { Languages } from '@shared/enums';
 import {
   checkIfThereIsAvailability,
   normalizeEvents,
@@ -15,37 +17,40 @@ export class GetAvailableDaysInCalendarService {
     private readonly listEventsService: ListEventsInCalendarService,
   ) {}
 
-  async execute(calendarId: string, month: string, year: string) {
+  async execute(
+    calendarId: string,
+    month: string,
+    year: string,
+    language: Languages,
+  ) {
     const nowISO = new Date().toISOString();
     const { data } = await this.listEventsService.execute(calendarId, nowISO);
     const normalizedEvents = normalizeEvents(data.items ?? []);
 
-    const monthDate = DateTime.fromObject({
-      month: parseInt(month),
-      year: parseInt(year),
+    const date = DateTime.fromObject({
+      month: Number(month),
+      year: Number(year),
     });
-    const daysInMonth = monthDate.daysInMonth;
+    const daysInMonth = date.daysInMonth;
 
     const availableDays: IWeekday[] = [];
 
-    for (let day = startDay(monthDate); day <= daysInMonth; day++) {
-      const dayDate = monthDate.set({ day });
+    for (let day = startDay(date); day <= daysInMonth; day++) {
+      const dayDate = date.set({ day });
 
       if (dayDate.weekday > 5) continue;
 
-      const dayEvents = normalizedEvents.filter(
-        (event) =>
-          event.start.year === dayDate.year &&
-          event.start.month === dayDate.month &&
-          event.start.day === dayDate.day,
+      const hasAvailability = checkIfThereIsAvailability(
+        dayDate,
+        normalizedEvents,
       );
-
-      const hasAvailability = checkIfThereIsAvailability(dayDate, dayEvents);
 
       if (hasAvailability) {
         availableDays.push({
           day,
-          weekday: dayDate.setLocale('pt-BR').toFormat('cccc'),
+          weekday: dayDate
+            .setLocale(LOCALES[language])
+            .toFormat(CALENDAR_PARAMETER.WEEKDAY_FORMAT),
         });
       }
     }

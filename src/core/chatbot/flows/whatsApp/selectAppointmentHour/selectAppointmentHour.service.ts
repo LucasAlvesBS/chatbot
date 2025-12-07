@@ -1,0 +1,134 @@
+import env from '@config/env';
+import { I18nTranslations } from '@core/i18n/generated';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { CACHE, REPLY_IDS, WHATSAPP_PARAMETER } from '@shared/constants';
+import { Languages } from '@shared/enums';
+import { buildWhatsAppRows } from '@shared/helpers';
+import { IRowStructure } from '@shared/interfaces';
+import { GetAvailableHoursInCalendarService } from '@shared/providers/calendars';
+import { SendInteractiveListsMessageService } from '@shared/providers/whatsApp';
+import { SetStateInSessionService } from '@shared/redis/session';
+import { formatPadStart } from '@shared/utils';
+import { I18nService } from 'nestjs-i18n';
+
+import { SelectAppointmentDayViaWhatsAppService } from '../selectAppointmentDay';
+
+@Injectable()
+export class SelectAppointmentHourViaWhatsAppService {
+  constructor(
+    private readonly i18nService: I18nService<I18nTranslations>,
+    private readonly sendList: SendInteractiveListsMessageService,
+    private readonly getAvailableHoursInCalendarService: GetAvailableHoursInCalendarService,
+    private readonly setState: SetStateInSessionService,
+    @Inject(forwardRef(() => SelectAppointmentDayViaWhatsAppService))
+    private readonly selectAppointmentDayViaWhatsAppService: SelectAppointmentDayViaWhatsAppService,
+  ) {}
+
+  async execute(phoneNumber: string, replyId: string, lang: Languages) {
+    if (replyId.startsWith(REPLY_IDS.DAY)) {
+      const [, day, month, year] = replyId.split('_');
+      return this.sendHoursList(phoneNumber, day, month, year, lang);
+    }
+
+    if (replyId.startsWith(REPLY_IDS.HOUR_MORE)) {
+      const [, , day, month, year, pageToken] = replyId.split('_');
+      return this.sendHoursList(phoneNumber, day, month, year, lang, pageToken);
+    }
+
+    if (replyId.startsWith(REPLY_IDS.HOUR_PREV)) {
+      const [, , day, month, year, pageToken] = replyId.split('_');
+      return this.sendHoursList(phoneNumber, day, month, year, lang, pageToken);
+    }
+
+    if (replyId.startsWith(REPLY_IDS.MONTH)) {
+      return this.selectAppointmentDayViaWhatsAppService.execute(
+        phoneNumber,
+        replyId,
+        lang,
+      );
+    }
+
+    if (replyId.startsWith(REPLY_IDS.HOUR)) {
+      return this.setState.execute(phoneNumber, CACHE.SELECTED_HOUR);
+    }
+  }
+
+  private async sendHoursList(
+    phoneNumber: string,
+    day: string,
+    month: string,
+    year: string,
+    lang: Languages,
+    pageToken?: string,
+  ) {
+    const page = pageToken ? Number(pageToken.replace('p', '')) : 1;
+
+    const availableHours =
+      await this.getAvailableHoursInCalendarService.execute(
+        env().google.calendarId,
+        day,
+        month,
+        year,
+      );
+
+    const rows = this.buildRows(availableHours, day, month, year, lang, page);
+
+    const message = this.i18nService.t(
+      'messages.flow.schedulingStarted.hourSelection',
+      {
+        lang,
+      },
+    );
+
+    const hoursList = this.i18nService.t('lists.hour', {
+      lang,
+    });
+
+    await this.sendList.execute({
+      to: phoneNumber,
+      message,
+      buttonLabel: hoursList.buttonLabel,
+      sections: [
+        {
+          title: hoursList.section.title,
+          rows,
+        },
+      ],
+    });
+  }
+
+  private buildRows(
+    hours: string[],
+    day: string,
+    month: string,
+    year: string,
+    lang: Languages,
+    page: number,
+  ): IRowStructure[] {
+    const formattedDay = formatPadStart(day);
+    const formattedMonth = formatPadStart(month);
+
+    return buildWhatsAppRows<string>(
+      hours,
+      page,
+      WHATSAPP_PARAMETER.PAGE_SIZE,
+      lang,
+      this.i18nService,
+      'lists.hour.section.rowTemplate',
+      'lists.hour.section.defaultRows',
+      (item) => {
+        const [hour, minute] = item.split(':');
+
+        return {
+          args: {
+            hour,
+            minute,
+            day: formattedDay,
+            month: formattedMonth,
+            year,
+          },
+        };
+      },
+    );
+  }
+}

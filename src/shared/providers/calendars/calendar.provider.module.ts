@@ -7,6 +7,7 @@ import { google } from 'googleapis';
 import { CreateEventInCalendarService } from './contexts/createEvent';
 import { DeleteEventInCalendarService } from './contexts/deleteEvent';
 import { GetAvailableDaysInCalendarService } from './contexts/getAvailableDays';
+import { GetAvailableHoursInCalendarService } from './contexts/getAvailableHours';
 import { GetAvailableMonthsInCalendarService } from './contexts/getAvailableMonths';
 import { ListEventsInCalendarService } from './contexts/listEvents';
 
@@ -25,6 +26,7 @@ import { ListEventsInCalendarService } from './contexts/listEvents';
     DeleteEventInCalendarService,
     ListEventsInCalendarService,
     GetAvailableDaysInCalendarService,
+    GetAvailableHoursInCalendarService,
     GetAvailableMonthsInCalendarService,
   ],
   exports: [
@@ -32,6 +34,7 @@ import { ListEventsInCalendarService } from './contexts/listEvents';
     DeleteEventInCalendarService,
     ListEventsInCalendarService,
     GetAvailableDaysInCalendarService,
+    GetAvailableHoursInCalendarService,
     GetAvailableMonthsInCalendarService,
   ],
 })
