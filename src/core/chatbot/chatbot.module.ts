@@ -2,12 +2,14 @@ import { I18nModule } from '@core/i18n';
 import { Module } from '@nestjs/common';
 import {
   CalendarProviderModule,
+  QueueProviderModule,
   WhatsappProviderModule,
 } from '@shared/providers';
 import { SessionModule } from '@shared/redis';
 
 import { WhatsAppChatbotService } from './channels/whatsApp';
 import {
+  ScheduleEventViaWhatsAppService,
   SelectDayViaWhatsAppService,
   SelectHourViaWhatsAppService,
   SelectMonthViaWhatsAppService,
@@ -20,6 +22,7 @@ import {
     SessionModule,
     I18nModule,
     CalendarProviderModule,
+    QueueProviderModule,
   ],
   providers: [
     WhatsAppChatbotService,
@@ -27,6 +30,7 @@ import {
     SelectDayViaWhatsAppService,
     SelectHourViaWhatsAppService,
     SelectMonthViaWhatsAppService,
+    ScheduleEventViaWhatsAppService,
   ],
   exports: [WhatsAppChatbotService],
 })

@@ -109,7 +109,7 @@ export class SelectDayViaWhatsAppService {
     );
 
     const message = this.i18nService.t(
-      'messages.flow.schedulingStarted.daySelection',
+      'messages.flow.scheduling.daySelection',
       { lang },
     );
 

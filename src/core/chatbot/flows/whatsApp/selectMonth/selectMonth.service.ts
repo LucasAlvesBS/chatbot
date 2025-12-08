@@ -33,7 +33,7 @@ export class SelectMonthViaWhatsAppService {
     );
 
     const message = this.i18nService.t(
-      'messages.flow.schedulingStarted.monthSelection',
+      'messages.flow.scheduling.monthSelection',
       { lang },
     );
 

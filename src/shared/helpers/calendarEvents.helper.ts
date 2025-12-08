@@ -94,7 +94,7 @@ export function checkIfThereIsAvailability(
 
   return freeBlocks.some((block) => {
     const diff = block.end.diff(block.start, 'minutes').minutes;
-    return diff >= env().business.consultationDuration;
+    return diff >= env().business.eventDuration;
   });
 }
 

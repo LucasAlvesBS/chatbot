@@ -11,5 +11,6 @@ export const bullMQConfig: BullRootModuleOptions = {
   defaultJobOptions: {
     delay: BULL_MQ_PARAMETER.DELAY,
     attempts: BULL_MQ_PARAMETER.ATTEMPTS,
+    removeOnComplete: true,
   },
 };

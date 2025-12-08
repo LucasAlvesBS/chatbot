@@ -11,6 +11,7 @@ import { SetStateInSessionService } from '@shared/redis/session';
 import { formatPadStart } from '@shared/utils';
 import { I18nService } from 'nestjs-i18n';
 
+import { ScheduleEventViaWhatsAppService } from '../scheduleEvent';
 import { SelectDayViaWhatsAppService } from '../selectDay';
 
 @Injectable()
@@ -22,6 +23,7 @@ export class SelectHourViaWhatsAppService {
     private readonly setState: SetStateInSessionService,
     @Inject(forwardRef(() => SelectDayViaWhatsAppService))
     private readonly selectDayViaWhatsAppService: SelectDayViaWhatsAppService,
+    private readonly scheduleEventViaWhatsAppService: ScheduleEventViaWhatsAppService,
   ) {}
 
   async execute(phoneNumber: string, replyId: string, lang: Languages) {
@@ -49,7 +51,12 @@ export class SelectHourViaWhatsAppService {
     }
 
     if (replyId.startsWith(REPLY_IDS.HOUR)) {
-      return this.setState.execute(phoneNumber, CACHE.SELECTED_HOUR);
+      await this.setState.execute(phoneNumber, CACHE.SELECTED_HOUR);
+      return this.scheduleEventViaWhatsAppService.execute(
+        phoneNumber,
+        replyId,
+        lang,
+      );
     }
   }
 
@@ -74,7 +81,7 @@ export class SelectHourViaWhatsAppService {
     const rows = this.buildRows(availableHours, day, month, year, lang, page);
 
     const message = this.i18nService.t(
-      'messages.flow.schedulingStarted.hourSelection',
+      'messages.flow.scheduling.hourSelection',
       {
         lang,
       },

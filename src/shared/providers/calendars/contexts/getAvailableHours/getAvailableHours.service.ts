@@ -28,7 +28,7 @@ export class GetAvailableHoursInCalendarService {
 
     const freeBlocks = getFreeBlocksInDay(date, normalizedEvents);
 
-    const slotMinutes = env().business.consultationDuration;
+    const slotMinutes = env().business.eventDuration;
     const availableHours: string[] = [];
 
     for (const block of freeBlocks) {

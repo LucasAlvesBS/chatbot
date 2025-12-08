@@ -1,4 +1,6 @@
+import { calendar_v3 } from 'googleapis';
+
 export type RegisterEventConsumerRequest = {
-  name: string;
-  cpf: string;
+  phoneNumber: string;
+  eventData: calendar_v3.Schema$Event;
 };

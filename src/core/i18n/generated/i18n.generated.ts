@@ -130,10 +130,11 @@ export type I18nTranslations = {
     "messages": {
         "welcome": string;
         "flow": {
-            "schedulingStarted": {
+            "scheduling": {
                 "monthSelection": string;
                 "daySelection": string;
                 "hourSelection": string;
+                "scheduledEvent": string;
             };
         };
     };

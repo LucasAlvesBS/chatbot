@@ -1,10 +1,11 @@
 {
   "welcome": "Olá! 👋\n\nSou o *Assistente Virtual* 🩺\nEstou aqui para lhe ajudar com seu atendimento.\n\nComo posso ajudar hoje?",
   "flow": {
-    "schedulingStarted": {
+    "scheduling": {
       "monthSelection": "Perfeito! 😊\n\nVamos realizar o seu *agendamento de consulta médica*.\n\nPor favor, selecione o *mês*.",
       "daySelection": "Certo! 🤗\n\nInforme o *dia* que funciona melhor para sua consulta.",
-      "hourSelection": "Quase lá! ⏰\n\nEscolha o *horário* que prefere para sua consulta."
+      "hourSelection": "Quase lá! ⏰\n\nEscolha o *horário* que prefere para sua consulta.",
+      "scheduledEvent": "Sua consulta foi marcada para o dia {day}/{month}/{year} às {hour}h{minute}. Até lá! 😊"
     }
   }
 }
