@@ -1,4 +1,5 @@
 import env from '@config/env';
+import { WhatsAppChatbotService } from '@core/chatbot/channels/whatsApp';
 import { I18nTranslations } from '@core/i18n/generated';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { CACHE, REPLY_IDS, WHATSAPP_PARAMETER } from '@shared/constants';
@@ -11,19 +12,15 @@ import { SetStateInSessionService } from '@shared/redis/session';
 import { formatPadStart } from '@shared/utils';
 import { I18nService } from 'nestjs-i18n';
 
-import { ScheduleEventViaWhatsAppService } from '../scheduleEvent';
-import { SelectDayViaWhatsAppService } from '../selectDay';
-
 @Injectable()
 export class SelectHourViaWhatsAppService {
   constructor(
+    @Inject(forwardRef(() => WhatsAppChatbotService))
+    private readonly whatsAppChatbotService: WhatsAppChatbotService,
     private readonly i18nService: I18nService<I18nTranslations>,
     private readonly sendList: SendInteractiveListsMessageService,
     private readonly getAvailableHoursInCalendarService: GetAvailableHoursInCalendarService,
     private readonly setState: SetStateInSessionService,
-    @Inject(forwardRef(() => SelectDayViaWhatsAppService))
-    private readonly selectDayViaWhatsAppService: SelectDayViaWhatsAppService,
-    private readonly scheduleEventViaWhatsAppService: ScheduleEventViaWhatsAppService,
   ) {}
 
   async execute(phoneNumber: string, replyId: string, lang: Languages) {
@@ -43,18 +40,16 @@ export class SelectHourViaWhatsAppService {
     }
 
     if (replyId.startsWith(REPLY_IDS.MONTH)) {
-      return this.selectDayViaWhatsAppService.execute(
-        phoneNumber,
-        replyId,
+      return this.whatsAppChatbotService.execute(
+        { senderPhoneNumber: phoneNumber, replyId },
         lang,
       );
     }
 
     if (replyId.startsWith(REPLY_IDS.HOUR)) {
       await this.setState.execute(phoneNumber, CACHE.SELECTED_HOUR);
-      return this.scheduleEventViaWhatsAppService.execute(
-        phoneNumber,
-        replyId,
+      return this.whatsAppChatbotService.execute(
+        { senderPhoneNumber: phoneNumber, replyId },
         lang,
       );
     }

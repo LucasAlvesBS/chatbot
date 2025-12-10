@@ -1,6 +1,7 @@
 import env from '@config/env';
+import { WhatsAppChatbotService } from '@core/chatbot/channels/whatsApp';
 import { I18nTranslations } from '@core/i18n/generated';
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { PathImpl2 } from '@nestjs/config';
 import { CACHE, REPLY_IDS, WHATSAPP_PARAMETER } from '@shared/constants';
 import { Languages } from '@shared/enums';
@@ -12,16 +13,13 @@ import { SetStateInSessionService } from '@shared/redis/session';
 import { formatPadStart } from '@shared/utils';
 import { I18nService } from 'nestjs-i18n';
 
-import { SelectHourViaWhatsAppService } from '../selectHour';
-import { SelectMonthViaWhatsAppService } from '../selectMonth';
-
 @Injectable()
 export class SelectDayViaWhatsAppService {
   constructor(
+    @Inject(forwardRef(() => WhatsAppChatbotService))
+    private readonly whatsAppChatbotService: WhatsAppChatbotService,
     private readonly i18nService: I18nService<I18nTranslations>,
     private readonly sendInteractiveListsMessageService: SendInteractiveListsMessageService,
-    private readonly selectMonthViaWhatsAppService: SelectMonthViaWhatsAppService,
-    private readonly selectHourViaWhatsAppService: SelectHourViaWhatsAppService,
     private readonly setStateInSession: SetStateInSessionService,
     private readonly getAvailableDaysInCalendarService: GetAvailableDaysInCalendarService,
   ) {}
@@ -68,15 +66,17 @@ export class SelectDayViaWhatsAppService {
     const dayMonth = this.i18nService.t(defaultRowsPath, { lang })[2];
 
     if (replyId === dayMonth.id) {
-      return this.selectMonthViaWhatsAppService.execute(phoneNumber, lang);
+      return this.whatsAppChatbotService.execute(
+        { senderPhoneNumber: phoneNumber, replyId },
+        lang,
+      );
     }
 
     if (replyId.startsWith(REPLY_IDS.DAY)) {
       await this.setStateInSession.execute(phoneNumber, CACHE.SELECTED_DAY);
 
-      return this.selectHourViaWhatsAppService.execute(
-        phoneNumber,
-        replyId,
+      return this.whatsAppChatbotService.execute(
+        { senderPhoneNumber: phoneNumber, replyId },
         lang,
       );
     }
