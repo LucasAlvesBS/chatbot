@@ -1,5 +1,5 @@
 import configuration from '@config/env';
-import { options } from '@config/typeorm';
+import { dataSourceOptions } from '@config/typeorm';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -14,7 +14,7 @@ import { HealthModule } from './modules/index';
       isGlobal: true,
     }),
     TypeOrmModule.forRoot({
-      ...options,
+      ...dataSourceOptions,
     }),
     HealthModule,
     WhatsAppModule,

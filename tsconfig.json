@@ -10,14 +10,14 @@
     "target": "es2017",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./src",
+    "baseUrl": "./",
     "incremental": true,
     "paths": {
-      "@config/*": ["config/*"],
-      "@shared/*": ["shared/*"],
-      "@modules/*": ["modules/*"],
-      "@channels/*": ["channels/*"],
-      "@core/*": ["core/*"]
+      "@config/*": ["src/config/*"],
+      "@shared/*": ["src/shared/*"],
+      "@modules/*": ["src/modules/*"],
+      "@channels/*": ["src/channels/*"],
+      "@core/*": ["src/core/*"]
     }
   }
 }
