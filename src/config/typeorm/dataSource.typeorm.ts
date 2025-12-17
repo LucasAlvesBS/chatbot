@@ -13,7 +13,16 @@ export const dataSourceOptions: PostgresConnectionOptions = {
   synchronize: false,
   logging: env().application.nodeEnv !== 'development',
   entities: [
-    join(__dirname, '..', '..', 'shared', 'entities', '*.entity.{ts,js}'),
+    join(
+      __dirname,
+      '..',
+      '..',
+      'shared',
+      'modules',
+      'database',
+      'entities',
+      '*.entity.{ts,js}',
+    ),
   ],
   ssl:
     String(env().database.ssl).toLowerCase() === 'true'
@@ -21,7 +30,16 @@ export const dataSourceOptions: PostgresConnectionOptions = {
       : false,
   migrations: [join(__dirname, 'migrations', '*{.js,.ts}')],
   subscribers: [
-    join(__dirname, '..', '..', 'shared', 'subscribers', '*.{ts,js}'),
+    join(
+      __dirname,
+      '..',
+      '..',
+      'shared',
+      'modules',
+      'database',
+      'subscribers',
+      '*.subscriber.{ts,js}',
+    ),
   ],
 };
 

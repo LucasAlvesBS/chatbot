@@ -1,1 +1,2 @@
-export * from './date.util';
+export * from './dates.util';
+export * from './documents.util';

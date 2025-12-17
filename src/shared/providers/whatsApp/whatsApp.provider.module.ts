@@ -31,4 +31,4 @@ import { SendTextMessageService } from './contexts/sendTextMessage';
     SendInteractiveListsMessageService,
   ],
 })
-export class WhatsappProviderModule {}
+export class WhatsAppProviderModule {}

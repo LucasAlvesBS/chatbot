@@ -1,5 +1,4 @@
 import env from '@config/env';
-import { I18nTranslations } from '@core/i18n/generated';
 import { InjectQueue } from '@nestjs/bull';
 import { Injectable } from '@nestjs/common';
 import {
@@ -9,18 +8,14 @@ import {
   TIMEZONES,
 } from '@shared/constants';
 import { Languages } from '@shared/enums';
-import { SendTextMessageService } from '@shared/providers/whatsApp';
 import { ClearStateInSessionService } from '@shared/redis/session';
 import { Queue } from 'bull';
 import { calendar_v3 } from 'googleapis';
 import { DateTime } from 'luxon';
-import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class ScheduleEventViaWhatsAppService {
   constructor(
-    private readonly i18nService: I18nService<I18nTranslations>,
-    private readonly sendTextMessageService: SendTextMessageService,
     private readonly clearStateInSessionService: ClearStateInSessionService,
     @InjectQueue(QUEUE_NAMES.REGISTER_EVENT)
     private readonly registerEventQueue: Queue,
@@ -28,6 +23,8 @@ export class ScheduleEventViaWhatsAppService {
 
   async execute(
     phoneNumber: string,
+    documentNumber: string,
+    userName: string,
     replyId: string,
     lang: Languages,
   ): Promise<void> {
@@ -63,28 +60,24 @@ export class ScheduleEventViaWhatsAppService {
       },
     };
 
-    const data = { phoneNumber, eventData };
+    const i18nArgs = {
+      day,
+      month,
+      year,
+      hour,
+      minute,
+    };
+
+    const data = {
+      phoneNumber,
+      documentNumber,
+      userName,
+      i18nArgs,
+      lang,
+      eventData,
+    };
 
     await this.registerEventQueue.add(data);
-
-    const message = this.i18nService.t(
-      'messages.flow.scheduling.scheduledEvent',
-      {
-        lang,
-        args: {
-          day,
-          month,
-          year,
-          hour,
-          minute,
-        },
-      },
-    );
-
-    await this.sendTextMessageService.execute({
-      to: phoneNumber,
-      message,
-    });
 
     return this.clearStateInSessionService.execute(phoneNumber);
   }

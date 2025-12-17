@@ -9,8 +9,12 @@ export const bullMQConfig: BullRootModuleOptions = {
     password: env().bullMQ.redis.password,
   },
   defaultJobOptions: {
-    delay: BULL_MQ_PARAMETER.DELAY,
     attempts: BULL_MQ_PARAMETER.ATTEMPTS,
+    backoff: {
+      type: BULL_MQ_PARAMETER.BACKOFF_TYPE,
+      delay: BULL_MQ_PARAMETER.BACKOFF_DELAY,
+    },
     removeOnComplete: true,
+    removeOnFail: false,
   },
 };

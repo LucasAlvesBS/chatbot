@@ -1,5 +1,6 @@
 export * from './apiTags.constant';
 export * from './cache.constant';
+export * from './doctors.constant';
 export * from './errorMessages.constant';
 export * from './events.constant';
 export * from './folders.constant';

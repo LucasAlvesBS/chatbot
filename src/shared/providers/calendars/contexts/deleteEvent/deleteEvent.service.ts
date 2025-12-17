@@ -9,7 +9,7 @@ export class DeleteEventInCalendarService {
     private readonly calendar: calendar_v3.Calendar,
   ) {}
 
-  deleteEvent(calendarId: string, eventId: string) {
+  execute(calendarId: string, eventId: string) {
     return this.calendar.events.delete({
       calendarId,
       eventId,

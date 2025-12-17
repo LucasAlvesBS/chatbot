@@ -20,10 +20,10 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prepare": "husky install",
     "lint-staged": "lint-staged",
-    "migration:run": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js  migration:run -d ./src/config/typeorm/dataSource",
-    "migration:revert": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js  migration:revert -d ./src/config/typeorm/dataSource",
+    "migration:run": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js  migration:run -d ./src/config/typeorm/dataSource.typeorm",
+    "migration:revert": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js  migration:revert -d ./src/config/typeorm/dataSource.typeorm",
     "migration:create": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:create ",
-    "migration:generate": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate  -d src/config/typeorm/dataSource"
+    "migration:generate": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate  -d src/config/typeorm/dataSource.typeorm"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.1",

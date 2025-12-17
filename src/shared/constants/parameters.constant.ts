@@ -1,6 +1,7 @@
 export const BULL_MQ_PARAMETER = {
-  DELAY: 1000,
   ATTEMPTS: 3,
+  BACKOFF_TYPE: 'exponential',
+  BACKOFF_DELAY: 3000,
 };
 
 export const CALENDAR_PARAMETER = {
@@ -13,4 +14,8 @@ export const CALENDAR_PARAMETER = {
 
 export const WHATSAPP_PARAMETER = {
   PAGE_SIZE: 8,
+};
+
+export const DATE_PARAMETER = {
+  SAFETY_INTERVAL_IN_MS: 60_000,
 };

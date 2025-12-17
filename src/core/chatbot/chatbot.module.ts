@@ -3,12 +3,14 @@ import { Module } from '@nestjs/common';
 import {
   CalendarProviderModule,
   QueueProviderModule,
-  WhatsappProviderModule,
+  WhatsAppProviderModule,
 } from '@shared/providers';
 import { SessionModule } from '@shared/redis';
 
 import { WhatsAppChatbotService } from './channels/whatsApp';
 import {
+  GetDocumentNumberViaWhatsAppService,
+  GetUserNameViaWhatsAppService,
   ScheduleEventViaWhatsAppService,
   SelectDayViaWhatsAppService,
   SelectHourViaWhatsAppService,
@@ -18,7 +20,7 @@ import {
 
 @Module({
   imports: [
-    WhatsappProviderModule,
+    WhatsAppProviderModule,
     SessionModule,
     I18nModule,
     CalendarProviderModule,
@@ -27,6 +29,8 @@ import {
   providers: [
     WhatsAppChatbotService,
     SendWelcomeMenuViaWhatsAppService,
+    GetDocumentNumberViaWhatsAppService,
+    GetUserNameViaWhatsAppService,
     SelectDayViaWhatsAppService,
     SelectHourViaWhatsAppService,
     SelectMonthViaWhatsAppService,

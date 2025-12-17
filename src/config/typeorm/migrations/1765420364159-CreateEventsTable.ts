@@ -17,6 +17,7 @@ const COLUMN_NAMES = {
   DOCTOR_ID: 'doctor_id',
   PATIENT_ID: 'patient_id',
   REFERENCE_ID: 'reference_id',
+  IDEMPOTENCY_KEY: 'idempotency_key',
 };
 
 export class CreateEventsTable1765420364159 implements MigrationInterface {
@@ -40,6 +41,11 @@ export class CreateEventsTable1765420364159 implements MigrationInterface {
           new TableColumn({
             name: 'start_date',
             type: 'timestamp',
+            isNullable: false,
+          }),
+          new TableColumn({
+            name: COLUMN_NAMES.IDEMPOTENCY_KEY,
+            type: 'varchar',
             isNullable: false,
           }),
           new TableColumn({
@@ -108,6 +114,18 @@ export class CreateEventsTable1765420364159 implements MigrationInterface {
         columnNames: [COLUMN_NAMES.REFERENCE_ID],
       }),
     ]);
+
+    await queryRunner.query(`
+      CREATE UNIQUE INDEX "UQ_EVENTS_IDEMPOTENCY_KEY_ACTIVE"
+      ON "events" ("idempotency_key")
+      WHERE "deleted_at" IS NULL;
+    `);
+
+    await queryRunner.query(`
+      CREATE UNIQUE INDEX "UQ_EVENTS_DOCTOR_ID_START_DATE_ACTIVE"
+      ON "events" ("doctor_id", "start_date")
+      WHERE "deleted_at" IS NULL;
+    `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

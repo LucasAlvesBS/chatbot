@@ -3,7 +3,7 @@ import { WhatsAppChatbotService } from '@core/chatbot/channels/whatsApp';
 import { I18nTranslations } from '@core/i18n/generated';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { PathImpl2 } from '@nestjs/config';
-import { CACHE, REPLY_IDS, WHATSAPP_PARAMETER } from '@shared/constants';
+import { REPLY_IDS, STATES, WHATSAPP_PARAMETER } from '@shared/constants';
 import { Languages } from '@shared/enums';
 import { buildWhatsAppRows } from '@shared/helpers';
 import { IRowStructure, IWeekday } from '@shared/interfaces';
@@ -73,7 +73,9 @@ export class SelectDayViaWhatsAppService {
     }
 
     if (replyId.startsWith(REPLY_IDS.DAY)) {
-      await this.setStateInSession.execute(phoneNumber, CACHE.SELECTED_DAY);
+      await this.setStateInSession.execute(phoneNumber, {
+        state: STATES.SELECTED_DAY,
+      });
 
       return this.whatsAppChatbotService.execute(
         { senderPhoneNumber: phoneNumber, replyId },

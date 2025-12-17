@@ -25,6 +25,9 @@ export class Event extends BaseEntity {
   @Index()
   referenceId: string;
 
+  @Column({ name: 'idempotency_key', type: 'varchar', nullable: false })
+  idempotencyKey: string;
+
   @Column({ name: 'start_date', type: 'timestamp', nullable: false })
   startDate: Date;
 

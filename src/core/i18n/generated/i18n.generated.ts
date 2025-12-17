@@ -135,7 +135,18 @@ export type I18nTranslations = {
                 "daySelection": string;
                 "hourSelection": string;
                 "scheduledEvent": string;
+                "errors": {
+                    "default": string;
+                    "conflict": string;
+                };
             };
+        };
+        "request": {
+            "documentNumber": string;
+            "userName": string;
+        };
+        "invalid": {
+            "documentNumber": string;
         };
     };
 };

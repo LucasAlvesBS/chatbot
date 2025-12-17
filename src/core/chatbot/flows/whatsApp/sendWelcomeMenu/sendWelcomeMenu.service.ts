@@ -1,6 +1,6 @@
 import { I18nTranslations } from '@core/i18n/generated';
 import { Injectable } from '@nestjs/common';
-import { CACHE } from '@shared/constants';
+import { STATES } from '@shared/constants';
 import { IButtonMessage } from '@shared/interfaces';
 import { SendButtonsMessageService } from '@shared/providers/whatsApp';
 import { SetStateInSessionService } from '@shared/redis/session';
@@ -25,6 +25,8 @@ export class SendWelcomeMenuViaWhatsAppService {
     };
 
     await this.sendButtonsMessageService.execute(buttonMessage);
-    await this.setStateInSession.execute(phoneNumber, CACHE.MENU_SENT);
+    await this.setStateInSession.execute(phoneNumber, {
+      state: STATES.MENU_SENT,
+    });
   }
 }

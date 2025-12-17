@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, DeepPartial, Repository } from 'typeorm';
+import { DataSource, DeepPartial, EntityManager, Repository } from 'typeorm';
 
 import { Patient } from '../entities';
 import { IPatientRepository } from '../interfaces/patient.interface';
@@ -22,8 +22,16 @@ export class PatientRepository implements IPatientRepository {
     });
   }
 
-  create(dto: DeepPartial<Patient>): Promise<Patient> {
+  create(
+    dto: DeepPartial<Patient>,
+    entityManager?: EntityManager,
+  ): Promise<Patient> {
     const data: Patient = this.repository.create(dto);
+
+    if (entityManager) {
+      return entityManager.save(Patient, data);
+    }
+
     return this.repository.save(data);
   }
 }

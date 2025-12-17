@@ -1,7 +1,7 @@
 import env from '@config/env';
 import { I18nTranslations } from '@core/i18n/generated';
 import { Injectable } from '@nestjs/common';
-import { CACHE } from '@shared/constants';
+import { STATES } from '@shared/constants';
 import { Languages } from '@shared/enums';
 import { IMonthYear } from '@shared/interfaces';
 import { GetAvailableMonthsInCalendarService } from '@shared/providers/calendars';
@@ -18,7 +18,11 @@ export class SelectMonthViaWhatsAppService {
     private readonly getAvailableMonthsInCalendarService: GetAvailableMonthsInCalendarService,
   ) {}
 
-  async execute(phoneNumber: string, lang: Languages): Promise<void> {
+  async execute(
+    phoneNumber: string,
+    userName: string,
+    lang: Languages,
+  ): Promise<void> {
     const allMonths = this.i18nService.t('lists.month');
 
     const availableMonths =
@@ -49,7 +53,10 @@ export class SelectMonthViaWhatsAppService {
       ],
     });
 
-    return this.setStateInSession.execute(phoneNumber, CACHE.SELECTED_MONTH);
+    return this.setStateInSession.execute(phoneNumber, {
+      state: STATES.SELECTED_MONTH,
+      userName: userName.trim(),
+    });
   }
 
   private filterRowsFromAvailableMonths(

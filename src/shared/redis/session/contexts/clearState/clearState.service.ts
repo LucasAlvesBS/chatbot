@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { CACHE } from '@shared/constants';
+import { SESSIONS } from '@shared/constants';
 import { PROVIDERS } from '@shared/constants';
 import Redis from 'ioredis';
 
@@ -10,6 +10,6 @@ export class ClearStateInSessionService {
   ) {}
 
   async execute(user: string): Promise<void> {
-    await this.redis.del(`${CACHE.CHAT_STATE}:${user}`);
+    await this.redis.del(`${SESSIONS.CHAT_STATE}:${user}`);
   }
 }

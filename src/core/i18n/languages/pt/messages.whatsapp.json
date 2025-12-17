@@ -5,7 +5,18 @@
       "monthSelection": "Perfeito! 😊\n\nVamos realizar o seu *agendamento de consulta médica*.\n\nPor favor, selecione o *mês*.",
       "daySelection": "Certo! 🤗\n\nInforme o *dia* que funciona melhor para sua consulta.",
       "hourSelection": "Quase lá! ⏰\n\nEscolha o *horário* que prefere para sua consulta.",
-      "scheduledEvent": "Sua consulta foi marcada para o dia {day}/{month}/{year} às {hour}h{minute}. Até lá! 😊"
+      "scheduledEvent": "Sua consulta foi agendada com sucesso ✅\n\n📅 *Data:* {day}/{month}/{year}\n⏰ *Horário:* {hour}h{minute}\n\nSe precisar remarcar ou cancelar, é só me avisar. 😊",
+      "errors": {
+        "default": "😕 Ops! Não consegui confirmar o seu agendamento agora.\n\nIsso pode acontecer por instabilidade momentânea.\n\n👉 Por favor, tente novamente em alguns instantes.",
+        "conflict": "⏳ Este horário acabou de ficar indisponível.\n\nIsso acontece quando outra consulta é agendada antes."
+      } 
     }
+  },
+  "request": {
+    "documentNumber": "Agora informe o CPF do paciente 🪪\n\nDigite somente os números (sem pontos ou traços).\n\nExemplo: 00000000000",
+    "userName": "Qual é o nome completo do paciente?"
+  },
+  "invalid": {
+    "documentNumber": "❌ CPF inválido!\n\n👉 Envie apenas os *11 números do CPF*, sem pontos ou traços.\n\nExemplo: 00000000000"
   }
 }

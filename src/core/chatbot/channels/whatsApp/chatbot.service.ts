@@ -1,4 +1,7 @@
 import {
+  GetDocumentNumberViaWhatsAppService,
+  GetUserNameViaWhatsAppService,
+  ScheduleEventViaWhatsAppService,
   SelectDayViaWhatsAppService,
   SelectHourViaWhatsAppService,
   SelectMonthViaWhatsAppService,
@@ -6,7 +9,7 @@ import {
 } from '@core/chatbot/flows/whatsApp';
 import { I18nTranslations } from '@core/i18n/generated';
 import { Injectable } from '@nestjs/common';
-import { CACHE } from '@shared/constants';
+import { STATES } from '@shared/constants';
 import { Languages } from '@shared/enums';
 import { IUnifiedMessage } from '@shared/interfaces';
 import { GetStateInSessionService } from '@shared/redis/session';
@@ -17,47 +20,78 @@ export class WhatsAppChatbotService {
   constructor(
     private readonly i18nService: I18nService<I18nTranslations>,
     private readonly sendWelcomeMenuViaWhatsAppService: SendWelcomeMenuViaWhatsAppService,
+    private readonly getDocumentNumberViaWhatsAppService: GetDocumentNumberViaWhatsAppService,
+    private readonly getUserNameViaWhatsAppService: GetUserNameViaWhatsAppService,
     private readonly selectDayViaWhatsAppService: SelectDayViaWhatsAppService,
     private readonly selectHourViaWhatsAppService: SelectHourViaWhatsAppService,
     private readonly selectMonthViaWhatsAppService: SelectMonthViaWhatsAppService,
+    private readonly scheduleEventViaWhatsAppService: ScheduleEventViaWhatsAppService,
     private readonly getStateInSession: GetStateInSessionService,
   ) {}
 
   async execute(unifiedMessage: IUnifiedMessage, lang = Languages.PT) {
-    const { senderPhoneNumber, replyId } = unifiedMessage;
+    const { senderPhoneNumber, replyId, message } = unifiedMessage;
 
-    const state = await this.getStateInSession.execute(senderPhoneNumber);
+    const session = await this.getStateInSession.execute(senderPhoneNumber);
 
-    if (!state) {
+    if (!session?.state) {
       return this.sendWelcomeMenuViaWhatsAppService.execute(senderPhoneNumber);
     }
 
-    switch (state) {
-      case CACHE.MENU_SENT:
-        return this.handleMenuSelection(replyId, senderPhoneNumber, lang);
+    const { state, userName, documentNumber } = session;
 
-      case CACHE.SELECTED_MONTH:
+    switch (state) {
+      case STATES.MENU_SENT:
+        return this.handleMenuSelection(
+          replyId,
+          senderPhoneNumber,
+          message,
+          lang,
+        );
+
+      case STATES.REQUESTED_DOCUMENT_NUMBER:
+        return this.getUserNameViaWhatsAppService.execute(
+          senderPhoneNumber,
+          message,
+          lang,
+        );
+
+      case STATES.REQUESTED_USER_NAME:
+        return this.selectMonthViaWhatsAppService.execute(
+          senderPhoneNumber,
+          message,
+          lang,
+        );
+
+      case STATES.SELECTED_MONTH:
         return this.selectDayViaWhatsAppService.execute(
           senderPhoneNumber,
           replyId,
           lang,
         );
 
-      case CACHE.SELECTED_DAY:
+      case STATES.SELECTED_DAY:
         return this.selectHourViaWhatsAppService.execute(
           senderPhoneNumber,
           replyId,
           lang,
         );
 
-      case CACHE.SELECTED_HOUR:
-        return;
+      case STATES.SELECTED_HOUR:
+        return this.scheduleEventViaWhatsAppService.execute(
+          senderPhoneNumber,
+          documentNumber,
+          userName,
+          replyId,
+          lang,
+        );
     }
   }
 
   private handleMenuSelection(
     replyId: string,
     phoneNumber: string,
+    message: string,
     lang: Languages,
   ) {
     const homeMenu = this.i18nService.t('buttons.homeMenu', { lang });
@@ -68,7 +102,10 @@ export class WhatsAppChatbotService {
 
     switch (replyId) {
       case scheduling:
-        return this.selectMonthViaWhatsAppService.execute(phoneNumber, lang);
+        return this.getDocumentNumberViaWhatsAppService.execute(
+          phoneNumber,
+          lang,
+        );
 
       case cancellation:
         console.log('flow_cancellation_started');

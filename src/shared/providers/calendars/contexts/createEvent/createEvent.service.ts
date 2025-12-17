@@ -9,7 +9,7 @@ export class CreateEventInCalendarService {
     private readonly calendar: calendar_v3.Calendar,
   ) {}
 
-  createEvent(calendarId: string, eventData: calendar_v3.Schema$Event) {
+  execute(calendarId: string, eventData: calendar_v3.Schema$Event) {
     return this.calendar.events.insert({
       calendarId,
       requestBody: eventData,

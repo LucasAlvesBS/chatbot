@@ -2,7 +2,7 @@ import env from '@config/env';
 import { WhatsAppChatbotService } from '@core/chatbot/channels/whatsApp';
 import { I18nTranslations } from '@core/i18n/generated';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { CACHE, REPLY_IDS, WHATSAPP_PARAMETER } from '@shared/constants';
+import { REPLY_IDS, STATES, WHATSAPP_PARAMETER } from '@shared/constants';
 import { Languages } from '@shared/enums';
 import { buildWhatsAppRows } from '@shared/helpers';
 import { IRowStructure } from '@shared/interfaces';
@@ -47,7 +47,7 @@ export class SelectHourViaWhatsAppService {
     }
 
     if (replyId.startsWith(REPLY_IDS.HOUR)) {
-      await this.setState.execute(phoneNumber, CACHE.SELECTED_HOUR);
+      await this.setState.execute(phoneNumber, { state: STATES.SELECTED_HOUR });
       return this.whatsAppChatbotService.execute(
         { senderPhoneNumber: phoneNumber, replyId },
         lang,
