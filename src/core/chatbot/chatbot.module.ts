@@ -1,14 +1,17 @@
 import { I18nModule } from '@core/i18n';
 import { Module } from '@nestjs/common';
+import { DatabaseModule } from '@shared/modules';
 import {
   CalendarProviderModule,
   QueueProviderModule,
   WhatsAppProviderModule,
 } from '@shared/providers';
-import { SessionModule } from '@shared/redis';
+import { SessionModule } from '@shared/redis/session';
 
 import { WhatsAppChatbotService } from './channels/whatsApp';
 import {
+  CancelEventViaWhatsAppService,
+  ConfirmCancellationOfEventViaWhatsAppService,
   GetDocumentNumberViaWhatsAppService,
   GetUserNameViaWhatsAppService,
   ScheduleEventViaWhatsAppService,
@@ -25,6 +28,7 @@ import {
     I18nModule,
     CalendarProviderModule,
     QueueProviderModule,
+    DatabaseModule,
   ],
   providers: [
     WhatsAppChatbotService,
@@ -35,6 +39,8 @@ import {
     SelectHourViaWhatsAppService,
     SelectMonthViaWhatsAppService,
     ScheduleEventViaWhatsAppService,
+    ConfirmCancellationOfEventViaWhatsAppService,
+    CancelEventViaWhatsAppService,
   ],
   exports: [WhatsAppChatbotService],
 })

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CALENDAR_PARAMETER } from '@shared/constants';
+import { CALENDAR_PARAMETER, DATE_PARAMETER } from '@shared/constants';
 import { Languages } from '@shared/enums';
 import { nowInBrazil } from '@shared/helpers';
 import { IMonthYear } from '@shared/interfaces';
@@ -27,7 +27,7 @@ export class GetAvailableMonthsInCalendarService {
     ) {
       const monthDate = currentDate.plus({ months: cursor });
 
-      const month = monthDate.toFormat(CALENDAR_PARAMETER.MONTH_NUMBER_FORMAT);
+      const month = monthDate.toFormat(DATE_PARAMETER.MONTH_NUMBER_FORMAT);
       const year = monthDate.year.toString();
 
       const hasAvailableDays =

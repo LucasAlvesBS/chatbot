@@ -1,6 +1,6 @@
 import env from '@config/env';
 import { Injectable } from '@nestjs/common';
-import { CALENDAR_PARAMETER } from '@shared/constants';
+import { DATE_PARAMETER } from '@shared/constants';
 import { getFreeBlocksInDay, normalizeEvents } from '@shared/helpers';
 import { DateTime } from 'luxon';
 
@@ -35,7 +35,9 @@ export class GetAvailableHoursInCalendarService {
       let cursor = block.start;
 
       while (cursor.plus({ minutes: slotMinutes }) <= block.end) {
-        availableHours.push(cursor.toFormat(CALENDAR_PARAMETER.HOUR_FORMART));
+        availableHours.push(
+          cursor.toFormat(DATE_PARAMETER.HOUR_MINUTE_FORMART),
+        );
         cursor = cursor.plus({ minutes: slotMinutes });
       }
     }

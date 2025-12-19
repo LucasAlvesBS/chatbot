@@ -8,7 +8,6 @@ import {
   TIMEZONES,
 } from '@shared/constants';
 import { Languages } from '@shared/enums';
-import { ClearStateInSessionService } from '@shared/redis/session';
 import { Queue } from 'bull';
 import { calendar_v3 } from 'googleapis';
 import { DateTime } from 'luxon';
@@ -16,7 +15,6 @@ import { DateTime } from 'luxon';
 @Injectable()
 export class ScheduleEventViaWhatsAppService {
   constructor(
-    private readonly clearStateInSessionService: ClearStateInSessionService,
     @InjectQueue(QUEUE_NAMES.REGISTER_EVENT)
     private readonly registerEventQueue: Queue,
   ) {}
@@ -79,6 +77,6 @@ export class ScheduleEventViaWhatsAppService {
 
     await this.registerEventQueue.add(data);
 
-    return this.clearStateInSessionService.execute(phoneNumber);
+    return;
   }
 }

@@ -55,14 +55,12 @@ export class SendInteractiveListsMessageService {
         },
       };
 
-      const response = await firstValueFrom(
+      await firstValueFrom(
         this.httpService.post(
           MESSAGES,
           snakeKeys(payload, { recursive: true, recursiveInArray: true }),
         ),
       );
-
-      return response.data;
     } catch (error) {
       this.logger.error(error.response?.data || error.message);
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CALENDAR_PARAMETER, LOCALES } from '@shared/constants';
+import { DATE_PARAMETER, LOCALES } from '@shared/constants';
 import { Languages } from '@shared/enums';
 import {
   checkIfThereIsAvailability,
@@ -50,7 +50,7 @@ export class GetAvailableDaysInCalendarService {
           day,
           weekday: dayDate
             .setLocale(LOCALES[language])
-            .toFormat(CALENDAR_PARAMETER.WEEKDAY_FORMAT),
+            .toFormat(DATE_PARAMETER.WEEKDAY_FORMAT),
         });
       }
     }

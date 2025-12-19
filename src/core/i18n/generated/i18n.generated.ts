@@ -20,6 +20,16 @@ export type I18nTranslations = {
                 "title": string;
             }
         ];
+        "binary": [
+            {
+                "id": string;
+                "title": string;
+            },
+            {
+                "id": string;
+                "title": string;
+            }
+        ];
     };
     "lists": {
         "month": {
@@ -140,7 +150,13 @@ export type I18nTranslations = {
                     "conflict": string;
                 };
             };
+            "cancellation": {
+                "success": string;
+                "eventFound": string;
+                "eventNotFound": string;
+            };
         };
+        "alreadyHasActiveEvent": string;
         "request": {
             "documentNumber": string;
             "userName": string;

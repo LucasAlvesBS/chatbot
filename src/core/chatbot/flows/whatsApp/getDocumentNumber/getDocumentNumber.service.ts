@@ -1,6 +1,5 @@
 import { I18nTranslations } from '@core/i18n/generated';
 import { Injectable } from '@nestjs/common';
-import { STATES } from '@shared/constants';
 import { Languages } from '@shared/enums';
 import { SendTextMessageService } from '@shared/providers/whatsApp';
 import { SetStateInSessionService } from '@shared/redis/session';
@@ -14,7 +13,11 @@ export class GetDocumentNumberViaWhatsAppService {
     private readonly setStateInSession: SetStateInSessionService,
   ) {}
 
-  async execute(phoneNumber: string, lang: Languages): Promise<void> {
+  async execute(
+    phoneNumber: string,
+    state: string,
+    lang: Languages,
+  ): Promise<void> {
     const message = this.i18nService.t('messages.request.documentNumber', {
       lang,
     });
@@ -25,7 +28,7 @@ export class GetDocumentNumberViaWhatsAppService {
     });
 
     await this.setStateInSession.execute(phoneNumber, {
-      state: STATES.REQUESTED_DOCUMENT_NUMBER,
+      state,
     });
   }
 }

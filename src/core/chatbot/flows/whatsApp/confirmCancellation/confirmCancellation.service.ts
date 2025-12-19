@@ -3,8 +3,14 @@ import { Inject, Injectable } from '@nestjs/common';
 import { PROVIDERS, STATES } from '@shared/constants';
 import { Languages } from '@shared/enums';
 import { IDatabaseProviders } from '@shared/modules/database/interfaces';
-import { SendTextMessageService } from '@shared/providers/whatsApp';
-import { SetStateInSessionService } from '@shared/redis/session';
+import {
+  SendButtonsMessageService,
+  SendTextMessageService,
+} from '@shared/providers/whatsApp';
+import {
+  ClearStateInSessionService,
+  SetStateInSessionService,
+} from '@shared/redis/session';
 import {
   checkIfItIsValidCPF,
   formatDateWithLuxon,
@@ -13,13 +19,15 @@ import {
 import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
-export class GetUserNameViaWhatsAppService {
+export class ConfirmCancellationOfEventViaWhatsAppService {
   constructor(
-    private readonly i18nService: I18nService<I18nTranslations>,
-    private readonly sendTextMessageService: SendTextMessageService,
-    private readonly setStateInSession: SetStateInSessionService,
     @Inject(PROVIDERS.DATABASE_PROVIDER)
     private readonly db: IDatabaseProviders,
+    private readonly i18nService: I18nService<I18nTranslations>,
+    private readonly sendTextMessageService: SendTextMessageService,
+    private readonly sendButtonsMessageService: SendButtonsMessageService,
+    private readonly setStateInSession: SetStateInSessionService,
+    private readonly clearStateInSessionService: ClearStateInSessionService,
   ) {}
 
   async execute(
@@ -45,30 +53,38 @@ export class GetUserNameViaWhatsAppService {
         documentNumber,
       );
 
-    if (event) {
-      const i18nArgs = formatDateWithLuxon(event.startDate);
-
-      message = this.i18nService.t('messages.alreadyHasActiveEvent', {
+    if (!event) {
+      message = this.i18nService.t('messages.flow.cancellation.eventNotFound', {
         lang,
-        args: i18nArgs,
       });
 
-      return this.sendTextMessageService.execute({
+      await this.sendTextMessageService.execute({
         to: phoneNumber,
         message,
       });
+
+      return this.clearStateInSessionService.execute(phoneNumber);
     }
 
-    message = this.i18nService.t('messages.request.userName', { lang });
+    const i18nArgs = formatDateWithLuxon(event.startDate);
 
-    await this.sendTextMessageService.execute({
+    message = this.i18nService.t('messages.flow.cancellation.eventFound', {
+      lang,
+      args: i18nArgs,
+    });
+
+    const buttons = this.i18nService.t('buttons.binary', { lang });
+
+    await this.sendButtonsMessageService.execute({
       to: phoneNumber,
       message,
+      buttons,
     });
 
     return this.setStateInSession.execute(phoneNumber, {
-      state: STATES.REQUESTED_USER_NAME,
-      documentNumber: normalizedDocumentNumber,
+      state: STATES.CONFIRMED_EVENT_CANCELLATION,
+      documentNumber,
+      eventReferenceId: event.referenceId,
     });
   }
 }

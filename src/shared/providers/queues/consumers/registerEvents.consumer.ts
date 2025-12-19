@@ -19,6 +19,7 @@ import {
   DeleteEventInCalendarService,
 } from '@shared/providers/calendars';
 import { SendTextMessageService } from '@shared/providers/whatsApp';
+import { ClearStateInSessionService } from '@shared/redis/session';
 import { Job } from 'bull';
 import { DateTime } from 'luxon';
 import { I18nService } from 'nestjs-i18n';
@@ -35,6 +36,7 @@ export class RegisterEventsConsumer {
     private readonly deleteEventInCalendarService: DeleteEventInCalendarService,
     private readonly i18nService: I18nService<I18nTranslations>,
     private readonly sendTextMessageService: SendTextMessageService,
+    private readonly clearStateInSessionService: ClearStateInSessionService,
     @Inject(PROVIDERS.DATABASE_PROVIDER)
     private readonly db: IDatabaseProviders,
   ) {}
@@ -132,10 +134,12 @@ export class RegisterEventsConsumer {
 
       this.logger.log(EVENT_REGTISTERED_FOR(phoneNumber));
 
-      return this.sendTextMessageService.execute({
+      await this.sendTextMessageService.execute({
         to: phoneNumber,
         message: scheduledEventMessage,
       });
+
+      return this.clearStateInSessionService.execute(phoneNumber);
     } catch (error) {
       if (eventId) {
         await this.deleteEventInCalendarService.execute(

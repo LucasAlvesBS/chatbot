@@ -1,4 +1,6 @@
 import {
+  CancelEventViaWhatsAppService,
+  ConfirmCancellationOfEventViaWhatsAppService,
   GetDocumentNumberViaWhatsAppService,
   GetUserNameViaWhatsAppService,
   ScheduleEventViaWhatsAppService,
@@ -26,6 +28,8 @@ export class WhatsAppChatbotService {
     private readonly selectHourViaWhatsAppService: SelectHourViaWhatsAppService,
     private readonly selectMonthViaWhatsAppService: SelectMonthViaWhatsAppService,
     private readonly scheduleEventViaWhatsAppService: ScheduleEventViaWhatsAppService,
+    private readonly confirmCancellationOfEventViaWhatsAppService: ConfirmCancellationOfEventViaWhatsAppService,
+    private readonly cancelEventViaWhatsAppService: CancelEventViaWhatsAppService,
     private readonly getStateInSession: GetStateInSessionService,
   ) {}
 
@@ -38,18 +42,13 @@ export class WhatsAppChatbotService {
       return this.sendWelcomeMenuViaWhatsAppService.execute(senderPhoneNumber);
     }
 
-    const { state, userName, documentNumber } = session;
+    const { state, userName, documentNumber, eventReferenceId } = session;
 
     switch (state) {
       case STATES.MENU_SENT:
-        return this.handleMenuSelection(
-          replyId,
-          senderPhoneNumber,
-          message,
-          lang,
-        );
+        return this.handleMenuSelection(replyId, senderPhoneNumber, lang);
 
-      case STATES.REQUESTED_DOCUMENT_NUMBER:
+      case STATES.REQUESTED_DOCUMENT_NUMBER_FOR_SCHEDULING:
         return this.getUserNameViaWhatsAppService.execute(
           senderPhoneNumber,
           message,
@@ -85,13 +84,26 @@ export class WhatsAppChatbotService {
           replyId,
           lang,
         );
+
+      case STATES.REQUESTED_DOCUMENT_NUMBER_FOR_CANCELLATION:
+        return this.confirmCancellationOfEventViaWhatsAppService.execute(
+          senderPhoneNumber,
+          message,
+          lang,
+        );
+
+      case STATES.CONFIRMED_EVENT_CANCELLATION:
+        return this.cancelEventViaWhatsAppService.execute(
+          senderPhoneNumber,
+          eventReferenceId,
+          lang,
+        );
     }
   }
 
   private handleMenuSelection(
     replyId: string,
     phoneNumber: string,
-    message: string,
     lang: Languages,
   ) {
     const homeMenu = this.i18nService.t('buttons.homeMenu', { lang });
@@ -104,12 +116,16 @@ export class WhatsAppChatbotService {
       case scheduling:
         return this.getDocumentNumberViaWhatsAppService.execute(
           phoneNumber,
+          STATES.REQUESTED_DOCUMENT_NUMBER_FOR_SCHEDULING,
           lang,
         );
 
       case cancellation:
-        console.log('flow_cancellation_started');
-        return;
+        return this.getDocumentNumberViaWhatsAppService.execute(
+          phoneNumber,
+          STATES.REQUESTED_DOCUMENT_NUMBER_FOR_CANCELLATION,
+          lang,
+        );
 
       case humanService:
         console.log('send_to_human');

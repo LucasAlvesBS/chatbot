@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { DATE_PARAMETER } from '@shared/constants';
+import { Order } from '@shared/enums';
 import {
   Between,
   DataSource,
   DeepPartial,
   EntityManager,
+  MoreThan,
   Repository,
   UpdateResult,
 } from 'typeorm';
@@ -31,6 +33,19 @@ export class EventRepository implements IEventRepository {
   getByReferenceId(referenceId: string): Promise<Event | null> {
     return this.repository.findOne({
       where: { referenceId },
+    });
+  }
+
+  getByDocumentNumber(documentNumber: string): Promise<Event | null> {
+    return this.repository.findOne({
+      where: {
+        deletedAt: null,
+        startDate: MoreThan(new Date()),
+        patient: {
+          documentNumber,
+        },
+      },
+      order: { startDate: Order.ASC },
     });
   }
 
@@ -64,7 +79,7 @@ export class EventRepository implements IEventRepository {
     return this.repository.update(id, partial);
   }
 
-  softDelete(id: string): Promise<UpdateResult> {
-    return this.repository.softDelete(id);
+  softDelete(referenceId: string): Promise<UpdateResult> {
+    return this.repository.softDelete({ referenceId });
   }
 }

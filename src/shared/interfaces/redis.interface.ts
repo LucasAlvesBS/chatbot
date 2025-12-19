@@ -1,5 +1,6 @@
 export interface IChatState {
   state: string;
-  documentNumber: string;
-  userName: string;
+  documentNumber?: string;
+  userName?: string;
+  eventReferenceId?: string;
 }
