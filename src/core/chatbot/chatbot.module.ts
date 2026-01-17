@@ -14,6 +14,7 @@ import {
   ConfirmCancellationOfEventViaWhatsAppService,
   GetDocumentNumberViaWhatsAppService,
   GetUserNameViaWhatsAppService,
+  ProvideHumanSupportViaWhatsAppService,
   ScheduleEventViaWhatsAppService,
   SelectDayViaWhatsAppService,
   SelectHourViaWhatsAppService,
@@ -41,6 +42,7 @@ import {
     ScheduleEventViaWhatsAppService,
     ConfirmCancellationOfEventViaWhatsAppService,
     CancelEventViaWhatsAppService,
+    ProvideHumanSupportViaWhatsAppService,
   ],
   exports: [WhatsAppChatbotService],
 })

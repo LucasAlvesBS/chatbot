@@ -9,13 +9,14 @@
       "errors": {
         "default": "Ops! Não consegui confirmar o seu agendamento agora 😕\n\nIsso pode acontecer por instabilidade momentânea.\n\n👉 Por favor, tente novamente em alguns instantes.",
         "conflict": "⏳ Este horário acabou de ficar indisponível.\n\nIsso acontece quando outra consulta é agendada antes."
-      } 
+      }
     },
     "cancellation": {
       "success": "*Consulta cancelada com sucesso!* ✅\n\nSe precisar realizar algum outro serviço, é só me avisar 😊",
       "eventFound": "Encontrei uma consulta marcada para você 📅\n\n*Data:* {day}/{month}/{year}\n*Horário:* {hour}h{minute}\n\nDeseja cancelar essa consulta?",
-      "eventNotFound": "Não encontrei nenhuma consulta ativa para você no momento 😕\n\nSe precisar agendar uma nova consulta, é só me avisar."    
-    }
+      "eventNotFound": "Não encontrei nenhuma consulta ativa para você no momento 😕\n\nSe precisar agendar uma nova consulta, é só me avisar."
+    },
+    "humanSupport": "👋 Um usuário pediu ajuda de um atendente humano.\n\n📞 *Contato:* {phoneNumber}\n\nQuando possível, por favor, dê sequência ao atendimento 😊"
   },
   "alreadyHasActiveEvent": "Verifiquei aqui e você já possui uma *consulta agendada* 📋\n\n*Data:* {day}/{month}/{year}\n*Horário:* {hour}h{minute}\n\nPara manter um melhor atendimento, é permitido apenas *uma consulta ativa por vez*.",
   "request": {

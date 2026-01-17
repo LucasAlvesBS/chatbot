@@ -155,6 +155,7 @@ export type I18nTranslations = {
                 "eventFound": string;
                 "eventNotFound": string;
             };
+            "humanSupport": string;
         };
         "alreadyHasActiveEvent": string;
         "request": {

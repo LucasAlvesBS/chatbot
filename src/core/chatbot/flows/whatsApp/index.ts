@@ -2,6 +2,7 @@ export * from './cancelEvent';
 export * from './confirmCancellation';
 export * from './getDocumentNumber';
 export * from './getUserName';
+export * from './provideHumanSupport';
 export * from './scheduleEvent';
 export * from './selectDay';
 export * from './selectHour';

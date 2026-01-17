@@ -3,6 +3,7 @@ import {
   ConfirmCancellationOfEventViaWhatsAppService,
   GetDocumentNumberViaWhatsAppService,
   GetUserNameViaWhatsAppService,
+  ProvideHumanSupportViaWhatsAppService,
   ScheduleEventViaWhatsAppService,
   SelectDayViaWhatsAppService,
   SelectHourViaWhatsAppService,
@@ -30,6 +31,7 @@ export class WhatsAppChatbotService {
     private readonly scheduleEventViaWhatsAppService: ScheduleEventViaWhatsAppService,
     private readonly confirmCancellationOfEventViaWhatsAppService: ConfirmCancellationOfEventViaWhatsAppService,
     private readonly cancelEventViaWhatsAppService: CancelEventViaWhatsAppService,
+    private readonly provideHumanSupportViaWhatsAppService: ProvideHumanSupportViaWhatsAppService,
     private readonly getStateInSession: GetStateInSessionService,
   ) {}
 
@@ -128,8 +130,10 @@ export class WhatsAppChatbotService {
         );
 
       case humanService:
-        console.log('send_to_human');
-        return;
+        return this.provideHumanSupportViaWhatsAppService.execute(
+          phoneNumber,
+          lang,
+        );
     }
   }
 }

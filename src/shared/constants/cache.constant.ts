@@ -13,4 +13,5 @@ export const STATES = {
   SELECTED_DAY: 'selected_day',
   SELECTED_HOUR: 'selected_hour',
   CONFIRMED_EVENT_CANCELLATION: 'confirmed_event_cancellation',
+  HUMAN_SERVICE_REQUESTED: 'human_service_requested',
 };
