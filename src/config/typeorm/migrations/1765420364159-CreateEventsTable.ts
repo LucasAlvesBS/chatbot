@@ -117,13 +117,13 @@ export class CreateEventsTable1765420364159 implements MigrationInterface {
 
     await queryRunner.query(`
       CREATE UNIQUE INDEX "UQ_EVENTS_IDEMPOTENCY_KEY_ACTIVE"
-      ON "events" ("idempotency_key")
+        ON "events" ("idempotency_key")
       WHERE "deleted_at" IS NULL;
     `);
 
     await queryRunner.query(`
       CREATE UNIQUE INDEX "UQ_EVENTS_DOCTOR_ID_START_DATE_ACTIVE"
-      ON "events" ("doctor_id", "start_date")
+        ON "events" ("doctor_id", "start_date")
       WHERE "deleted_at" IS NULL;
     `);
   }

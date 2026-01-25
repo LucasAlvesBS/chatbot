@@ -1,10 +1,10 @@
 import { Column, Entity, Index, OneToMany, Relation } from 'typeorm';
 
-import { BaseEntity } from './base.entity';
+import { CompleteBaseEntity } from './completeBase.entity';
 import { Event } from './event.entity';
 
 @Entity('patients')
-export class Patient extends BaseEntity {
+export class Patient extends CompleteBaseEntity {
   @Column({ type: 'varchar', nullable: false })
   name: string;
 
