@@ -39,7 +39,6 @@ export class EventRepository implements IEventRepository {
   getByDocumentNumber(documentNumber: string): Promise<Event | null> {
     return this.repository.findOne({
       where: {
-        deletedAt: null,
         startDate: MoreThan(new Date()),
         patient: {
           documentNumber,

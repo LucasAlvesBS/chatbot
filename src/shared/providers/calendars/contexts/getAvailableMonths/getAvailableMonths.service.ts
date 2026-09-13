@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CALENDAR_PARAMETER, DATE_PARAMETER } from '@shared/constants';
-import { Languages } from '@shared/enums';
 import { nowInBrazil } from '@shared/helpers';
 import { IMonthYear } from '@shared/interfaces';
 
@@ -12,10 +11,7 @@ export class GetAvailableMonthsInCalendarService {
     private readonly getAvailableDaysInCalendarService: GetAvailableDaysInCalendarService,
   ) {}
 
-  async execute(
-    calendarId: string,
-    language: Languages,
-  ): Promise<IMonthYear[]> {
+  async execute(calendarId: string): Promise<IMonthYear[]> {
     const currentDate = nowInBrazil();
     const availableMonths: IMonthYear[] = [];
 
@@ -35,7 +31,6 @@ export class GetAvailableMonthsInCalendarService {
           calendarId,
           month,
           year,
-          language,
         );
 
       if (hasAvailableDays) {

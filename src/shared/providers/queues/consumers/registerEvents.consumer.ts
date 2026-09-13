@@ -1,5 +1,4 @@
 import env from '@config/env';
-import { I18nTranslations } from '@core/i18n/generated';
 import { OnQueueFailed, Process, Processor } from '@nestjs/bull';
 import { ConflictException, Inject, Logger } from '@nestjs/common';
 import {
@@ -11,8 +10,8 @@ import {
   QUEUE_NAMES,
   REGISTERING_EVENT_FOR,
   REGISTRATION_FAILED,
+  WHATSAPP_MESSAGES,
 } from '@shared/constants';
-import { Languages } from '@shared/enums';
 import { IDatabaseProviders } from '@shared/modules/database/interfaces';
 import {
   CreateEventInCalendarService,
@@ -22,7 +21,6 @@ import { SendTextMessageService } from '@shared/providers/whatsApp';
 import { ClearStateInSessionService } from '@shared/redis/session';
 import { Job } from 'bull';
 import { DateTime } from 'luxon';
-import { I18nService } from 'nestjs-i18n';
 import { EntityManager } from 'typeorm';
 
 import { RegisterEventConsumerRequest } from './types';
@@ -34,7 +32,6 @@ export class RegisterEventsConsumer {
   constructor(
     private readonly createEventInCalendarService: CreateEventInCalendarService,
     private readonly deleteEventInCalendarService: DeleteEventInCalendarService,
-    private readonly i18nService: I18nService<I18nTranslations>,
     private readonly sendTextMessageService: SendTextMessageService,
     private readonly clearStateInSessionService: ClearStateInSessionService,
     @Inject(PROVIDERS.DATABASE_PROVIDER)
@@ -43,12 +40,12 @@ export class RegisterEventsConsumer {
 
   @Process()
   async execute(job: Job<RegisterEventConsumerRequest>) {
-    const { phoneNumber, documentNumber, userName, i18nArgs, lang, eventData } =
+    const { phoneNumber, documentNumber, userName, i18nArgs, eventData } =
       job.data;
 
     this.logger.log(REGISTERING_EVENT_FOR(phoneNumber));
 
-    let eventId: string;
+    let eventId: string = '';
 
     try {
       const doctor =
@@ -56,17 +53,24 @@ export class RegisterEventsConsumer {
           DOCTOR_REGISTRATION_NUMBER,
         );
 
-      const scheduledEventMessage = this.i18nService.t(
-        'messages.flow.scheduling.scheduledEvent',
-        {
-          lang,
-          args: i18nArgs,
-        },
-      );
+      const defaultMessage = WHATSAPP_MESSAGES.flow.scheduling.errors.default;
 
-      const startDateUTC = DateTime.fromISO(eventData.start.dateTime, {
-        setZone: true,
-      })
+      if (!doctor) {
+        return this.sendTextMessageService.execute({
+          to: phoneNumber,
+          message: defaultMessage,
+        });
+      }
+
+      const scheduledEventMessage =
+        WHATSAPP_MESSAGES.flow.scheduling.scheduledEvent(i18nArgs);
+
+      const startDateUTC = DateTime.fromISO(
+        eventData.start?.dateTime as string,
+        {
+          setZone: true,
+        },
+      )
         .toUTC()
         .toJSDate();
 
@@ -87,11 +91,11 @@ export class RegisterEventsConsumer {
       }
 
       const { data } = await this.createEventInCalendarService.execute(
-        env().google.calendarId,
+        env().google.calendarId as string,
         eventData,
       );
 
-      eventId = data.id;
+      eventId = data.id as string;
 
       let patient =
         await this.db.repositories.patientRepository.getByDocumentNumber(
@@ -143,17 +147,15 @@ export class RegisterEventsConsumer {
     } catch (error) {
       if (eventId) {
         await this.deleteEventInCalendarService.execute(
-          env().google.calendarId,
+          env().google.calendarId as string,
           eventId,
         );
       }
 
-      const errorMessage = this.getErrorMessage(lang);
-
       if (error instanceof ConflictException) {
         return this.sendTextMessageService.execute({
           to: phoneNumber,
-          message: errorMessage.conflict,
+          message: WHATSAPP_MESSAGES.flow.scheduling.errors.conflict,
         });
       }
 
@@ -163,11 +165,9 @@ export class RegisterEventsConsumer {
 
   @OnQueueFailed()
   async onFailed(job: Job<RegisterEventConsumerRequest>, error: Error) {
-    const { phoneNumber, lang } = job.data;
+    const { phoneNumber } = job.data;
 
     this.logger.error(REGISTRATION_FAILED(phoneNumber, error?.message));
-
-    const errorMessage = this.getErrorMessage(lang);
 
     const totalAttempts = job.opts.attempts ?? 1;
     const isLastAttempt = job.attemptsMade + 1 >= totalAttempts;
@@ -178,11 +178,7 @@ export class RegisterEventsConsumer {
 
     return this.sendTextMessageService.execute({
       to: phoneNumber,
-      message: errorMessage.default,
+      message: WHATSAPP_MESSAGES.flow.scheduling.errors.default,
     });
-  }
-
-  private getErrorMessage(lang: Languages) {
-    return this.i18nService.t('messages.flow.scheduling.errors', { lang });
   }
 }

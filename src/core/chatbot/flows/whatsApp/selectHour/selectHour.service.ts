@@ -1,57 +1,59 @@
 import env from '@config/env';
 import { WhatsAppChatbotService } from '@core/chatbot/channels/whatsApp';
-import { I18nTranslations } from '@core/i18n/generated';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { REPLY_IDS, STATES, WHATSAPP_PARAMETER } from '@shared/constants';
-import { Languages } from '@shared/enums';
+import {
+  REPLY_IDS,
+  STATES,
+  WHATSAPP_LISTS,
+  WHATSAPP_MESSAGES,
+  WHATSAPP_PARAMETER,
+} from '@shared/constants';
 import { buildWhatsAppRows } from '@shared/helpers';
 import { IRowStructure } from '@shared/interfaces';
 import { GetAvailableHoursInCalendarService } from '@shared/providers/calendars';
 import { SendInteractiveListsMessageService } from '@shared/providers/whatsApp';
 import { SetStateInSessionService } from '@shared/redis/session';
 import { formatPadStart } from '@shared/utils';
-import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class SelectHourViaWhatsAppService {
   constructor(
     @Inject(forwardRef(() => WhatsAppChatbotService))
     private readonly whatsAppChatbotService: WhatsAppChatbotService,
-    private readonly i18nService: I18nService<I18nTranslations>,
     private readonly sendList: SendInteractiveListsMessageService,
     private readonly getAvailableHoursInCalendarService: GetAvailableHoursInCalendarService,
     private readonly setState: SetStateInSessionService,
   ) {}
 
-  async execute(phoneNumber: string, replyId: string, lang: Languages) {
+  async execute(phoneNumber: string, replyId: string) {
     if (replyId.startsWith(REPLY_IDS.DAY)) {
       const [, day, month, year] = replyId.split('_');
-      return this.sendHoursList(phoneNumber, day, month, year, lang);
+      return this.sendHoursList(phoneNumber, day, month, year);
     }
 
     if (replyId.startsWith(REPLY_IDS.HOUR_MORE)) {
       const [, , day, month, year, pageToken] = replyId.split('_');
-      return this.sendHoursList(phoneNumber, day, month, year, lang, pageToken);
+      return this.sendHoursList(phoneNumber, day, month, year, pageToken);
     }
 
     if (replyId.startsWith(REPLY_IDS.HOUR_PREV)) {
       const [, , day, month, year, pageToken] = replyId.split('_');
-      return this.sendHoursList(phoneNumber, day, month, year, lang, pageToken);
+      return this.sendHoursList(phoneNumber, day, month, year, pageToken);
     }
 
     if (replyId.startsWith(REPLY_IDS.MONTH)) {
-      return this.whatsAppChatbotService.execute(
-        { senderPhoneNumber: phoneNumber, replyId },
-        lang,
-      );
+      return this.whatsAppChatbotService.execute({
+        senderPhoneNumber: phoneNumber,
+        replyId,
+      });
     }
 
     if (replyId.startsWith(REPLY_IDS.HOUR)) {
       await this.setState.execute(phoneNumber, { state: STATES.SELECTED_HOUR });
-      return this.whatsAppChatbotService.execute(
-        { senderPhoneNumber: phoneNumber, replyId },
-        lang,
-      );
+      return this.whatsAppChatbotService.execute({
+        senderPhoneNumber: phoneNumber,
+        replyId,
+      });
     }
   }
 
@@ -60,31 +62,22 @@ export class SelectHourViaWhatsAppService {
     day: string,
     month: string,
     year: string,
-    lang: Languages,
     pageToken?: string,
   ) {
     const page = pageToken ? Number(pageToken.replace('p', '')) : 1;
 
     const availableHours =
       await this.getAvailableHoursInCalendarService.execute(
-        env().google.calendarId,
+        env().google.calendarId as string,
         day,
         month,
         year,
       );
 
-    const rows = this.buildRows(availableHours, day, month, year, lang, page);
+    const rows = this.buildRows(availableHours, day, month, year, page);
 
-    const message = this.i18nService.t(
-      'messages.flow.scheduling.hourSelection',
-      {
-        lang,
-      },
-    );
-
-    const hoursList = this.i18nService.t('lists.hour', {
-      lang,
-    });
+    const message = WHATSAPP_MESSAGES.flow.scheduling.hourSelection;
+    const hoursList = WHATSAPP_LISTS.hour;
 
     await this.sendList.execute({
       to: phoneNumber,
@@ -104,32 +97,40 @@ export class SelectHourViaWhatsAppService {
     day: string,
     month: string,
     year: string,
-    lang: Languages,
     page: number,
   ): IRowStructure[] {
     const formattedDay = formatPadStart(day);
     const formattedMonth = formatPadStart(month);
 
+    const defaultRows = WHATSAPP_LISTS.hour.section.defaultRows;
+
     return buildWhatsAppRows<string>(
       hours,
       page,
       WHATSAPP_PARAMETER.PAGE_SIZE,
-      lang,
-      this.i18nService,
-      'lists.hour.section.rowTemplate',
-      'lists.hour.section.defaultRows',
       (item) => {
         const [hour, minute] = item.split(':');
 
         return {
-          args: {
+          id: WHATSAPP_LISTS.hour.section.rowTemplate.id(
             hour,
             minute,
-            day: formattedDay,
-            month: formattedMonth,
+            formattedDay,
+            formattedMonth,
             year,
-          },
+          ),
+          title: WHATSAPP_LISTS.hour.section.rowTemplate.title(hour, minute),
         };
+      },
+      {
+        more: defaultRows.more(formattedDay, formattedMonth, year, page + 1),
+        previous: defaultRows.previous(
+          formattedDay,
+          formattedMonth,
+          year,
+          page - 1,
+        ),
+        selectionReset: defaultRows.changeDay(formattedMonth, year),
       },
     );
   }

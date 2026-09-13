@@ -1,34 +1,25 @@
 import env from '@config/env';
-import { I18nTranslations } from '@core/i18n/generated';
 import { Injectable } from '@nestjs/common';
-import { STATES } from '@shared/constants';
-import { Languages } from '@shared/enums';
+import { STATES, WHATSAPP_LISTS, WHATSAPP_MESSAGES } from '@shared/constants';
 import { IMonthYear } from '@shared/interfaces';
 import { GetAvailableMonthsInCalendarService } from '@shared/providers/calendars';
 import { SendInteractiveListsMessageService } from '@shared/providers/whatsApp';
 import { SetStateInSessionService } from '@shared/redis/session';
-import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class SelectMonthViaWhatsAppService {
   constructor(
-    private readonly i18nService: I18nService<I18nTranslations>,
     private readonly sendInteractiveListsMessageService: SendInteractiveListsMessageService,
     private readonly setStateInSession: SetStateInSessionService,
     private readonly getAvailableMonthsInCalendarService: GetAvailableMonthsInCalendarService,
   ) {}
 
-  async execute(
-    phoneNumber: string,
-    userName: string,
-    lang: Languages,
-  ): Promise<void> {
-    const allMonths = this.i18nService.t('lists.month');
+  async execute(phoneNumber: string, userName: string): Promise<void> {
+    const allMonths = WHATSAPP_LISTS.month;
 
     const availableMonths =
       await this.getAvailableMonthsInCalendarService.execute(
-        env().google.calendarId,
-        lang,
+        env().google.calendarId as string,
       );
 
     const filteredMonthRows = this.filterRowsFromAvailableMonths(
@@ -36,10 +27,7 @@ export class SelectMonthViaWhatsAppService {
       availableMonths,
     );
 
-    const message = this.i18nService.t(
-      'messages.flow.scheduling.monthSelection',
-      { lang },
-    );
+    const message = WHATSAPP_MESSAGES.flow.scheduling.monthSelection;
 
     await this.sendInteractiveListsMessageService.execute({
       to: phoneNumber,
@@ -60,7 +48,7 @@ export class SelectMonthViaWhatsAppService {
   }
 
   private filterRowsFromAvailableMonths(
-    allMonthRows: Array<{ id: string; title: string }>,
+    allMonthRows: readonly { id: string; title: string }[],
     availableMonths: IMonthYear[],
   ) {
     return availableMonths.map((item) => {

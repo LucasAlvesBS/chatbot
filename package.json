@@ -26,15 +26,15 @@
     "migration:generate": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate  -d src/config/typeorm/dataSource.typeorm"
   },
   "dependencies": {
-    "@nestjs/axios": "^4.0.1",
-    "@nestjs/bull": "^11.0.4",
-    "@nestjs/common": "^11.0.1",
-    "@nestjs/config": "^4.0.2",
-    "@nestjs/core": "^11.0.1",
-    "@nestjs/platform-express": "^11.0.1",
-    "@nestjs/swagger": "^11.2.3",
-    "@nestjs/terminus": "^11.0.0",
-    "@nestjs/typeorm": "^11.0.0",
+    "@nestjs/axios": "^12.0.0",
+    "@nestjs/bull": "^12.0.0",
+    "@nestjs/common": "^12.0.1",
+    "@nestjs/config": "^12.0.0",
+    "@nestjs/core": "^12.0.1",
+    "@nestjs/platform-express": "^12.0.1",
+    "@nestjs/swagger": "^12.0.1",
+    "@nestjs/terminus": "^12.0.0",
+    "@nestjs/typeorm": "^12.0.1",
     "bull": "^4.16.5",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
@@ -42,7 +42,6 @@
     "ioredis": "^5.8.2",
     "js-convert-case": "^4.2.0",
     "luxon": "^3.7.2",
-    "nestjs-i18n": "^10.6.0",
     "pg": "^8.16.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
@@ -51,9 +50,9 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
-    "@nestjs/cli": "^11.0.0",
-    "@nestjs/schematics": "^11.0.0",
-    "@nestjs/testing": "^11.0.1",
+    "@nestjs/cli": "^12.0.0",
+    "@nestjs/schematics": "^12.0.0",
+    "@nestjs/testing": "^12.0.1",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
     "@types/luxon": "^3.7.1",
@@ -73,12 +72,12 @@
     "prettier": "^3.4.2",
     "source-map-support": "^0.5.21",
     "supertest": "^7.0.0",
-    "ts-jest": "^29.2.5",
+    "ts-jest": "^29.4.12",
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.20.0"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.70.0"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -111,9 +110,6 @@
     "**/*.spec.(t|j)s": [
       "jest --detectOpenHandles --findRelatedTests"
     ],
-    "**/*.ts": [
-      "npm run build"
-    ],
     "**/*.(t|j)s": [
       "prettier --write --ignore-unknown",
       "eslint --cache --fix"
@@ -126,7 +122,7 @@
   },
   "engines": {
     "npm": ">=6.0.0",
-    "node": ">=20.0.0",
+    "node": ">=20.19.0",
     "yarn": "please-use-npm"
   }
 }

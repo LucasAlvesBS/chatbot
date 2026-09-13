@@ -7,7 +7,7 @@ import {
   startDay,
 } from '@shared/helpers';
 import { IWeekday } from '@shared/interfaces';
-import { DateTime } from 'luxon';
+import { DateTime, PossibleDaysInMonth } from 'luxon';
 
 import { ListEventsInCalendarService } from '../listEvents';
 
@@ -17,12 +17,7 @@ export class GetAvailableDaysInCalendarService {
     private readonly listEventsService: ListEventsInCalendarService,
   ) {}
 
-  async execute(
-    calendarId: string,
-    month: string,
-    year: string,
-    language: Languages,
-  ) {
+  async execute(calendarId: string, month: string, year: string) {
     const nowISO = new Date().toISOString();
     const { data } = await this.listEventsService.execute(calendarId, nowISO);
     const normalizedEvents = normalizeEvents(data.items ?? []);
@@ -31,7 +26,7 @@ export class GetAvailableDaysInCalendarService {
       month: Number(month),
       year: Number(year),
     });
-    const daysInMonth = date.daysInMonth;
+    const daysInMonth = date.daysInMonth as PossibleDaysInMonth;
 
     const availableDays: IWeekday[] = [];
 
@@ -49,7 +44,7 @@ export class GetAvailableDaysInCalendarService {
         availableDays.push({
           day,
           weekday: dayDate
-            .setLocale(LOCALES[language])
+            .setLocale(LOCALES[Languages.PT])
             .toFormat(DATE_PARAMETER.WEEKDAY_FORMAT),
         });
       }

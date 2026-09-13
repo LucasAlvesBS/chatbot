@@ -1,8 +1,11 @@
 import env from '@config/env';
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { SecuritySchemeObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
+import {
+  DocumentBuilder,
+  SecuritySchemeObject,
+  SwaggerModule,
+} from '@nestjs/swagger';
 import { VERSIONS } from '@shared/constants';
 import { Envs } from '@shared/enums';
 

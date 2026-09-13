@@ -6,7 +6,9 @@ import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConne
 export const dataSourceOptions: PostgresConnectionOptions = {
   type: 'postgres',
   host: env().database.host,
-  port: env().database.port ? parseInt(env().database.port, 10) : 5432,
+  port: env().database.port
+    ? parseInt(env().database.port as string, 10)
+    : 5432,
   username: env().database.user,
   password: env().database.password,
   database: env().database.name,

@@ -1,7 +1,10 @@
-import { I18nTranslations } from '@core/i18n/generated';
 import { Inject, Injectable } from '@nestjs/common';
-import { PROVIDERS, STATES } from '@shared/constants';
-import { Languages } from '@shared/enums';
+import {
+  PROVIDERS,
+  STATES,
+  WHATSAPP_BUTTONS,
+  WHATSAPP_MESSAGES,
+} from '@shared/constants';
 import { IDatabaseProviders } from '@shared/modules/database/interfaces';
 import {
   SendButtonsMessageService,
@@ -16,32 +19,26 @@ import {
   formatDateWithLuxon,
   normalizeCPF,
 } from '@shared/utils';
-import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class ConfirmCancellationOfEventViaWhatsAppService {
   constructor(
     @Inject(PROVIDERS.DATABASE_PROVIDER)
     private readonly db: IDatabaseProviders,
-    private readonly i18nService: I18nService<I18nTranslations>,
     private readonly sendTextMessageService: SendTextMessageService,
     private readonly sendButtonsMessageService: SendButtonsMessageService,
     private readonly setStateInSession: SetStateInSessionService,
     private readonly clearStateInSessionService: ClearStateInSessionService,
   ) {}
 
-  async execute(
-    phoneNumber: string,
-    documentNumber: string,
-    lang: Languages,
-  ): Promise<void> {
+  async execute(phoneNumber: string, documentNumber: string): Promise<void> {
     const normalizedDocumentNumber = normalizeCPF(documentNumber);
     const isDocumentNumber = checkIfItIsValidCPF(normalizedDocumentNumber);
 
     let message: string;
 
     if (!isDocumentNumber) {
-      message = this.i18nService.t('messages.invalid.documentNumber', { lang });
+      message = WHATSAPP_MESSAGES.invalid.documentNumber;
       return this.sendTextMessageService.execute({
         to: phoneNumber,
         message,
@@ -54,9 +51,7 @@ export class ConfirmCancellationOfEventViaWhatsAppService {
       );
 
     if (!event) {
-      message = this.i18nService.t('messages.flow.cancellation.eventNotFound', {
-        lang,
-      });
+      message = WHATSAPP_MESSAGES.flow.cancellation.eventNotFound;
 
       await this.sendTextMessageService.execute({
         to: phoneNumber,
@@ -66,14 +61,11 @@ export class ConfirmCancellationOfEventViaWhatsAppService {
       return this.clearStateInSessionService.execute(phoneNumber);
     }
 
-    const i18nArgs = formatDateWithLuxon(event.startDate);
+    const messageArgs = formatDateWithLuxon(event.startDate);
 
-    message = this.i18nService.t('messages.flow.cancellation.eventFound', {
-      lang,
-      args: i18nArgs,
-    });
+    message = WHATSAPP_MESSAGES.flow.cancellation.eventFound(messageArgs);
 
-    const buttons = this.i18nService.t('buttons.binary', { lang });
+    const buttons = WHATSAPP_BUTTONS.binary;
 
     await this.sendButtonsMessageService.execute({
       to: phoneNumber,

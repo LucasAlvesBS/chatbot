@@ -15,7 +15,7 @@ export interface IButtonStructure {
 }
 
 export interface IButtonMessage extends ISimpleMessage {
-  buttons: IButtonStructure[];
+  buttons: readonly IButtonStructure[];
 }
 
 export interface IRowStructure {
@@ -31,7 +31,7 @@ export interface ISectionStrucuture {
 
 export interface IInteractiveListMessage extends ISimpleMessage {
   buttonLabel: string;
-  sections: ISectionStrucuture[];
+  sections: readonly ISectionStrucuture[];
   header?: string;
   footer?: string;
 }

@@ -1,4 +1,3 @@
-import { I18nModule } from '@core/i18n';
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from '@shared/modules';
 import {
@@ -26,7 +25,6 @@ import {
   imports: [
     WhatsAppProviderModule,
     SessionModule,
-    I18nModule,
     CalendarProviderModule,
     QueueProviderModule,
     DatabaseModule,

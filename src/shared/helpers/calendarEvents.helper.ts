@@ -48,7 +48,10 @@ export function getFreeBlocksInDay(
   const eventIntervals = filteredEvents
     .filter((event) => !event.isAllDay && event.raw.end?.dateTime)
     .map((event) => {
-      return { start: event.start, end: toBrazilDate(event.raw.end.dateTime) };
+      return {
+        start: event.start,
+        end: toBrazilDate(event.raw.end?.dateTime as string),
+      };
     });
 
   const freeBlocks: IDateRange[] = [];
@@ -106,14 +109,14 @@ export function normalizeEvents(
   );
 
   const mappedEvents = validEvents.map((event) => {
-    const start = event.start.dateTime
+    const start = event.start?.dateTime
       ? toBrazilDate(event.start.dateTime)
-      : DateTime.fromISO(event.start.date).set({ hour: 0 });
+      : DateTime.fromISO(event.start?.date as string).set({ hour: 0 });
 
     return {
       raw: event,
       start,
-      isAllDay: Boolean(event.start.date),
+      isAllDay: Boolean(event.start?.date),
     };
   });
 

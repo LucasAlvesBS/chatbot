@@ -1,7 +1,5 @@
-import { I18nTranslations } from '@core/i18n/generated';
 import { Inject, Injectable } from '@nestjs/common';
-import { PROVIDERS, STATES } from '@shared/constants';
-import { Languages } from '@shared/enums';
+import { PROVIDERS, STATES, WHATSAPP_MESSAGES } from '@shared/constants';
 import { IDatabaseProviders } from '@shared/modules/database/interfaces';
 import { SendTextMessageService } from '@shared/providers/whatsApp';
 import { SetStateInSessionService } from '@shared/redis/session';
@@ -10,30 +8,24 @@ import {
   formatDateWithLuxon,
   normalizeCPF,
 } from '@shared/utils';
-import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class GetUserNameViaWhatsAppService {
   constructor(
-    private readonly i18nService: I18nService<I18nTranslations>,
     private readonly sendTextMessageService: SendTextMessageService,
     private readonly setStateInSession: SetStateInSessionService,
     @Inject(PROVIDERS.DATABASE_PROVIDER)
     private readonly db: IDatabaseProviders,
   ) {}
 
-  async execute(
-    phoneNumber: string,
-    documentNumber: string,
-    lang: Languages,
-  ): Promise<void> {
+  async execute(phoneNumber: string, documentNumber: string): Promise<void> {
     const normalizedDocumentNumber = normalizeCPF(documentNumber);
     const isDocumentNumber = checkIfItIsValidCPF(normalizedDocumentNumber);
 
     let message: string;
 
     if (!isDocumentNumber) {
-      message = this.i18nService.t('messages.invalid.documentNumber', { lang });
+      message = WHATSAPP_MESSAGES.invalid.documentNumber;
       return this.sendTextMessageService.execute({
         to: phoneNumber,
         message,
@@ -46,12 +38,9 @@ export class GetUserNameViaWhatsAppService {
       );
 
     if (event) {
-      const i18nArgs = formatDateWithLuxon(event.startDate);
+      const messageArgs = formatDateWithLuxon(event.startDate);
 
-      message = this.i18nService.t('messages.alreadyHasActiveEvent', {
-        lang,
-        args: i18nArgs,
-      });
+      message = WHATSAPP_MESSAGES.alreadyHasActiveEvent(messageArgs);
 
       return this.sendTextMessageService.execute({
         to: phoneNumber,
@@ -59,7 +48,7 @@ export class GetUserNameViaWhatsAppService {
       });
     }
 
-    message = this.i18nService.t('messages.request.userName', { lang });
+    message = WHATSAPP_MESSAGES.request.userName;
 
     await this.sendTextMessageService.execute({
       to: phoneNumber,

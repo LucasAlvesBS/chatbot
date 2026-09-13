@@ -3,6 +3,7 @@ import { BadGatewayException, Injectable, Logger } from '@nestjs/common';
 import { CODE_MESSAGE, MESSAGES } from '@shared/constants';
 import { Channels, MessageTypes } from '@shared/enums';
 import { ISimpleMessage, IWhatsAppMessage } from '@shared/interfaces';
+import axios from 'axios';
 import { snakeKeys } from 'js-convert-case';
 import { firstValueFrom } from 'rxjs';
 
@@ -28,7 +29,13 @@ export class SendTextMessageService {
         ),
       );
     } catch (error) {
-      this.logger.error(error.response?.data || error.message);
+      if (axios.isAxiosError(error)) {
+        this.logger.error(error.response?.data || error.message);
+      } else if (error instanceof Error) {
+        this.logger.error(error.message);
+      } else {
+        this.logger.error(error);
+      }
 
       throw new BadGatewayException(CODE_MESSAGE.SOMETHING_WRONG_HAPPENED);
     }

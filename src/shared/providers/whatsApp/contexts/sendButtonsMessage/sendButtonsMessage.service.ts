@@ -12,6 +12,7 @@ import {
   IWhatsAppButton,
   IWhatsAppButtonsMessagePayload,
 } from '@shared/interfaces';
+import axios from 'axios';
 import { snakeKeys } from 'js-convert-case';
 import { firstValueFrom } from 'rxjs';
 
@@ -51,7 +52,13 @@ export class SendButtonsMessageService {
         ),
       );
     } catch (error) {
-      this.logger.error(error.response?.data || error.message);
+      if (axios.isAxiosError(error)) {
+        this.logger.error(error.response?.data || error.message);
+      } else if (error instanceof Error) {
+        this.logger.error(error.message);
+      } else {
+        this.logger.error(error);
+      }
 
       throw new BadGatewayException(CODE_MESSAGE.SOMETHING_WRONG_HAPPENED);
     }
