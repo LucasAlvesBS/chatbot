@@ -3,6 +3,7 @@ import {
   QueryRunner,
   Table,
   TableColumn,
+  TableForeignKey,
   TableIndex,
 } from 'typeorm';
 
@@ -33,6 +34,11 @@ export class CreateDoctorsTable1765420342204 implements MigrationInterface {
             isUnique: true,
           }),
           new TableColumn({
+            name: 'user_id',
+            type: 'uuid',
+            isNullable: false,
+          }),
+          new TableColumn({
             name: 'created_at',
             type: 'timestamp',
             default: 'now()',
@@ -53,13 +59,27 @@ export class CreateDoctorsTable1765420342204 implements MigrationInterface {
       }),
     );
 
-    await queryRunner.createIndex(
+    await queryRunner.createForeignKey(
       this.TABLE_NAME,
+      new TableForeignKey({
+        name: `FK_${this.TABLE_NAME}_USER`.toUpperCase(),
+        columnNames: ['user_id'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'users',
+        onDelete: 'NO ACTION',
+      }),
+    );
+
+    await queryRunner.createIndices(this.TABLE_NAME, [
       new TableIndex({
         name: `IDX_${this.TABLE_NAME}_REGISTRATION_NUMBER`.toUpperCase(),
         columnNames: ['registration_number'],
       }),
-    );
+      new TableIndex({
+        name: `IDX_${this.TABLE_NAME}_USER`.toUpperCase(),
+        columnNames: ['user_id'],
+      }),
+    ]);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
