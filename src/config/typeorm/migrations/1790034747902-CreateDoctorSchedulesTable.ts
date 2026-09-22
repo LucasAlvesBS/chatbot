@@ -7,18 +7,15 @@ import {
   TableIndex,
 } from 'typeorm';
 
-const TABLE_NAMES = {
-  EXCEPTIONAL_DAYS: 'exceptional_days',
-  DOCTORS: 'doctors',
-};
-
-export class CreateExceptionalDaysTable1769291849927
+export class CreateDoctorSchedulesTable1790034747902
   implements MigrationInterface
 {
+  private TABLE_NAME = 'doctor_schedules';
+
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: TABLE_NAMES.EXCEPTIONAL_DAYS,
+        name: this.TABLE_NAME,
         columns: [
           new TableColumn({
             name: 'id',
@@ -28,13 +25,18 @@ export class CreateExceptionalDaysTable1769291849927
             default: 'uuid_generate_v4()',
           }),
           new TableColumn({
-            name: 'start_date',
-            type: 'timestamp',
+            name: 'day_of_week',
+            type: 'varchar',
             isNullable: false,
           }),
           new TableColumn({
-            name: 'end_date',
-            type: 'timestamp',
+            name: 'start_time',
+            type: 'time',
+            isNullable: false,
+          }),
+          new TableColumn({
+            name: 'end_time',
+            type: 'time',
             isNullable: false,
           }),
           new TableColumn({
@@ -48,42 +50,42 @@ export class CreateExceptionalDaysTable1769291849927
             default: 'now()',
             isNullable: false,
           }),
+          new TableColumn({
+            name: 'updated_at',
+            type: 'timestamp',
+            default: 'now()',
+            isNullable: false,
+          }),
+          new TableColumn({
+            name: 'deleted_at',
+            type: 'timestamp',
+            isNullable: true,
+          }),
         ],
       }),
     );
 
     await queryRunner.createForeignKey(
-      TABLE_NAMES.EXCEPTIONAL_DAYS,
+      this.TABLE_NAME,
       new TableForeignKey({
-        name: `FK_${TABLE_NAMES.EXCEPTIONAL_DAYS}_DOCTOR`.toUpperCase(),
+        name: `FK_${this.TABLE_NAME}_DOCTOR`.toUpperCase(),
         columnNames: ['doctor_id'],
         referencedColumnNames: ['id'],
-        referencedTableName: TABLE_NAMES.DOCTORS,
+        referencedTableName: 'doctors',
         onDelete: 'CASCADE',
       }),
     );
 
-    await queryRunner.createIndices(TABLE_NAMES.EXCEPTIONAL_DAYS, [
+    await queryRunner.createIndex(
+      this.TABLE_NAME,
       new TableIndex({
-        name: `IDX_${TABLE_NAMES.EXCEPTIONAL_DAYS}_START_DATE_END_DATE`.toUpperCase(),
-        columnNames: ['start_date', 'end_date'],
-      }),
-      new TableIndex({
-        name: `IDX_${TABLE_NAMES.EXCEPTIONAL_DAYS}_START_DATE`.toUpperCase(),
-        columnNames: ['start_date'],
-      }),
-      new TableIndex({
-        name: `IDX_${TABLE_NAMES.EXCEPTIONAL_DAYS}_END_DATE`.toUpperCase(),
-        columnNames: ['end_date'],
-      }),
-      new TableIndex({
-        name: `IDX_${TABLE_NAMES.EXCEPTIONAL_DAYS}_DOCTOR`.toUpperCase(),
+        name: `IDX_${this.TABLE_NAME}_DOCTOR`.toUpperCase(),
         columnNames: ['doctor_id'],
       }),
-    ]);
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable(TABLE_NAMES.EXCEPTIONAL_DAYS, true, true, true);
+    await queryRunner.dropTable(this.TABLE_NAME, true, true, true);
   }
 }

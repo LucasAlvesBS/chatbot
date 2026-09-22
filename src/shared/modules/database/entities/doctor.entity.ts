@@ -1,11 +1,11 @@
 import { Column, Entity, Index, OneToMany, Relation } from 'typeorm';
 
-import { CompleteBaseEntity } from './completeBase.entity';
-import { Event } from './event.entity';
-import { ExceptionalDay } from './exceptionalDay.entity';
+import { AgendaException } from './agendaException.entity';
+import { BaseEntity } from './base.entity';
+import { Consultation } from './consultation.entity';
 
 @Entity('doctors')
-export class Doctor extends CompleteBaseEntity {
+export class Doctor extends BaseEntity {
   @Column({ type: 'varchar', nullable: false })
   name: string;
 
@@ -13,9 +13,9 @@ export class Doctor extends CompleteBaseEntity {
   @Index()
   registrationNumber: string;
 
-  @OneToMany(() => Event, (event) => event.doctor)
-  events?: Relation<Event>[];
+  @OneToMany(() => Consultation, (consultation) => consultation.doctor)
+  consultations?: Relation<Consultation>[];
 
-  @OneToMany(() => ExceptionalDay, (event) => event.doctor)
-  exceptionalDays?: Relation<ExceptionalDay>[];
+  @OneToMany(() => AgendaException, (event) => event.doctor)
+  agendaExceptions?: Relation<AgendaException>[];
 }

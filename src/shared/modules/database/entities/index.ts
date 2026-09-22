@@ -1,5 +1,6 @@
+export { AgendaException } from './agendaException.entity';
+export { Consultation } from './consultation.entity';
 export { Doctor } from './doctor.entity';
-export { Event } from './event.entity';
-export { ExceptionalDay } from './exceptionalDay.entity';
+export { DoctorSchedule } from './doctorSchedule.entity';
 export { Holiday } from './holiday.entity';
 export { Patient } from './patient.entity';

@@ -77,7 +77,7 @@ export class RegisterEventsConsumer {
       const idempotencyKey = `${doctor.id}:${startDateUTC.toISOString()}`;
 
       const hasEventByIdempotencyKey =
-        await this.db.repositories.eventRepository.existsByIdempotencyKey(
+        await this.db.repositories.consultationRepository.existsByIdempotencyKey(
           idempotencyKey,
         );
 
@@ -102,7 +102,8 @@ export class RegisterEventsConsumer {
           documentNumber,
         );
 
-      const entityManager = this.db.repositories.eventRepository.getManager();
+      const entityManager =
+        this.db.repositories.consultationRepository.getManager();
 
       await entityManager.transaction(async (manager: EntityManager) => {
         if (!patient) {
@@ -116,7 +117,7 @@ export class RegisterEventsConsumer {
         }
 
         const hasEventByStartDate =
-          await this.db.repositories.eventRepository.existsByStartDate(
+          await this.db.repositories.consultationRepository.existsByStartDate(
             startDateUTC,
           );
 
@@ -124,7 +125,7 @@ export class RegisterEventsConsumer {
           throw new ConflictException(CODE_MESSAGE.EVENT_ALREADY_EXISTS);
         }
 
-        await this.db.repositories.eventRepository.create(
+        await this.db.repositories.consultationRepository.create(
           {
             referenceId: eventId,
             startDate: startDateUTC,

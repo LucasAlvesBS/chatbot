@@ -22,7 +22,9 @@ export class CancelEventViaWhatsAppService {
       eventReferenceId,
     );
 
-    await this.db.repositories.eventRepository.softDelete(eventReferenceId);
+    await this.db.repositories.consultationRepository.softDelete(
+      eventReferenceId,
+    );
 
     const message = WHATSAPP_MESSAGES.flow.cancellation.success;
 

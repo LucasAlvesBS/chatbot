@@ -1,5 +1,6 @@
+import { join } from 'node:path';
+
 import env from '@config/env';
-import { join } from 'path';
 import { DataSource } from 'typeorm';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 

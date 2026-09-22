@@ -33,7 +33,7 @@ export class GetUserNameViaWhatsAppService {
     }
 
     const event =
-      await this.db.repositories.eventRepository.getByDocumentNumber(
+      await this.db.repositories.consultationRepository.getByDocumentNumber(
         documentNumber,
       );
 

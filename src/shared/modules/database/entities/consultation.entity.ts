@@ -7,12 +7,12 @@ import {
   Relation,
 } from 'typeorm';
 
-import { CompleteBaseEntity } from './completeBase.entity';
+import { BaseEntity } from './base.entity';
 import { Doctor } from './doctor.entity';
 import { Patient } from './patient.entity';
 
-@Entity('events')
-export class Event extends CompleteBaseEntity {
+@Entity('consultations')
+export class Consultation extends BaseEntity {
   @Column({ name: 'doctor_id', type: 'varchar', nullable: false })
   @Index()
   doctorId: string;
@@ -31,11 +31,11 @@ export class Event extends CompleteBaseEntity {
   @Column({ name: 'start_date', type: 'timestamp', nullable: false })
   startDate: Date;
 
-  @ManyToOne(() => Doctor, (doctor) => doctor.events)
+  @ManyToOne(() => Doctor, (doctor) => doctor.consultations)
   @JoinColumn({ name: 'doctor_id', referencedColumnName: 'id' })
   doctor: Relation<Doctor>;
 
-  @ManyToOne(() => Patient, (patient) => patient.events)
+  @ManyToOne(() => Patient, (patient) => patient.consultations)
   @JoinColumn({ name: 'patient_id', referencedColumnName: 'id' })
   patient: Relation<Patient>;
 }

@@ -6,15 +6,13 @@ import {
   TableIndex,
 } from 'typeorm';
 
-const TABLE_NAME = 'doctors';
-
 export class CreateDoctorsTable1765420342204 implements MigrationInterface {
-  public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";');
+  private TABLE_NAME = 'doctors';
 
+  public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: TABLE_NAME,
+        name: this.TABLE_NAME,
         columns: [
           new TableColumn({
             name: 'id',
@@ -56,15 +54,15 @@ export class CreateDoctorsTable1765420342204 implements MigrationInterface {
     );
 
     await queryRunner.createIndex(
-      TABLE_NAME,
+      this.TABLE_NAME,
       new TableIndex({
-        name: `IDX_${TABLE_NAME}_REGISTRATION_NUMBER`.toUpperCase(),
+        name: `IDX_${this.TABLE_NAME}_REGISTRATION_NUMBER`.toUpperCase(),
         columnNames: ['registration_number'],
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable(TABLE_NAME, true, true, true);
+    await queryRunner.dropTable(this.TABLE_NAME, true, true, true);
   }
 }

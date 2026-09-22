@@ -2,13 +2,15 @@ import {
   MigrationInterface,
   QueryRunner,
   Table,
-  TableCheck,
   TableColumn,
+  TableForeignKey,
   TableIndex,
 } from 'typeorm';
 
-export class CreateHolidaysTable1769291843038 implements MigrationInterface {
-  private TABLE_NAME = 'holidays';
+export class CreateUsersPatientsTable1765420357849
+  implements MigrationInterface
+{
+  private TABLE_NAME = 'users_patients';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
@@ -23,39 +25,14 @@ export class CreateHolidaysTable1769291843038 implements MigrationInterface {
             default: 'uuid_generate_v4()',
           }),
           new TableColumn({
-            name: 'date',
-            type: 'date',
+            name: 'user_id',
+            type: 'uuid',
             isNullable: false,
           }),
           new TableColumn({
-            name: 'name',
-            type: 'varchar',
+            name: 'patient_id',
+            type: 'uuid',
             isNullable: false,
-          }),
-          new TableColumn({
-            name: 'type',
-            type: 'int',
-            isNullable: false,
-          }),
-          new TableColumn({
-            name: 'is_recurring',
-            type: 'boolean',
-            isNullable: false,
-          }),
-          new TableColumn({
-            name: 'country_code',
-            type: 'varchar',
-            isNullable: false,
-          }),
-          new TableColumn({
-            name: 'state_code',
-            type: 'varchar',
-            isNullable: true,
-          }),
-          new TableColumn({
-            name: 'city_code',
-            type: 'varchar',
-            isNullable: true,
           }),
           new TableColumn({
             name: 'created_at',
@@ -78,23 +55,35 @@ export class CreateHolidaysTable1769291843038 implements MigrationInterface {
       }),
     );
 
-    await queryRunner.createCheckConstraint(
-      this.TABLE_NAME,
-      new TableCheck({
-        columnNames: ['type'],
-        expression: 'type >= 0 AND type < 3',
-        name: `CK_${this.TABLE_NAME}_valid_type`.toUpperCase(),
+    await queryRunner.createForeignKeys(this.TABLE_NAME, [
+      new TableForeignKey({
+        name: `FK_${this.TABLE_NAME}_USER`.toUpperCase(),
+        columnNames: ['user_id'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'users',
+        onDelete: 'NO ACTION',
       }),
-    );
+      new TableForeignKey({
+        name: `FK_${this.TABLE_NAME}_PATIENT`.toUpperCase(),
+        columnNames: ['patient_id'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'patients',
+        onDelete: 'NO ACTION',
+      }),
+    ]);
 
     await queryRunner.createIndices(this.TABLE_NAME, [
       new TableIndex({
-        name: `IDX_${this.TABLE_NAME}_type`.toUpperCase(),
-        columnNames: ['type'],
+        name: `IDX_${this.TABLE_NAME}_USER_PATIENT`.toUpperCase(),
+        columnNames: ['user_id', 'patient_id'],
       }),
       new TableIndex({
-        name: `IDX_${this.TABLE_NAME}_is_recurring`.toUpperCase(),
-        columnNames: ['is_recurring'],
+        name: `IDX_${this.TABLE_NAME}_USER`.toUpperCase(),
+        columnNames: ['user_id'],
+      }),
+      new TableIndex({
+        name: `IDX_${this.TABLE_NAME}_PATIENT`.toUpperCase(),
+        columnNames: ['patient_id'],
       }),
     ]);
   }

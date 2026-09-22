@@ -11,32 +11,32 @@ import {
   UpdateResult,
 } from 'typeorm';
 
-import { Event } from '../entities';
-import { IEventRepository } from '../interfaces/event.interface';
+import { Consultation } from '../entities';
+import { IConsultationRepository } from '../interfaces/consultation.interface';
 
 @Injectable()
-export class EventRepository implements IEventRepository {
-  private readonly repository: Repository<Event>;
+export class ConsultationRepository implements IConsultationRepository {
+  private readonly repository: Repository<Consultation>;
 
   constructor(private readonly dataSource: DataSource) {
-    this.repository = this.dataSource.getRepository(Event);
+    this.repository = this.dataSource.getRepository(Consultation);
   }
 
   getManager() {
     return this.dataSource.createEntityManager();
   }
 
-  getById(id: string): Promise<Event | null> {
+  getById(id: string): Promise<Consultation | null> {
     return this.repository.findOne({ where: { id } });
   }
 
-  getByReferenceId(referenceId: string): Promise<Event | null> {
+  getByReferenceId(referenceId: string): Promise<Consultation | null> {
     return this.repository.findOne({
       where: { referenceId },
     });
   }
 
-  getByDocumentNumber(documentNumber: string): Promise<Event | null> {
+  getByDocumentNumber(documentNumber: string): Promise<Consultation | null> {
     return this.repository.findOne({
       where: {
         startDate: MoreThan(new Date()),
@@ -62,19 +62,19 @@ export class EventRepository implements IEventRepository {
   }
 
   create(
-    dto: DeepPartial<Event>,
+    dto: DeepPartial<Consultation>,
     entityManager?: EntityManager,
-  ): Promise<Event> {
-    const data: Event = this.repository.create(dto);
+  ): Promise<Consultation> {
+    const data: Consultation = this.repository.create(dto);
 
     if (entityManager) {
-      return entityManager.save(Event, data);
+      return entityManager.save(Consultation, data);
     }
 
     return this.repository.save(data);
   }
 
-  update(id: string, partial: Partial<Event>) {
+  update(id: string, partial: Partial<Consultation>) {
     return this.repository.update(id, partial);
   }
 

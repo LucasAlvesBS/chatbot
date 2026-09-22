@@ -5,8 +5,8 @@ import { DataSource } from 'typeorm';
 
 import { IDatabaseProviders } from './interfaces';
 import {
+  ConsultationRepository,
   DoctorRepository,
-  EventRepository,
   PatientRepository,
 } from './repositories';
 
@@ -23,8 +23,8 @@ const databaseProviders: Provider[] = [
 
         return {
           repositories: {
+            consultationRepository: new ConsultationRepository(dataSource),
             doctorRepository: new DoctorRepository(dataSource),
-            eventRepository: new EventRepository(dataSource),
             patientRepository: new PatientRepository(dataSource),
           },
         };

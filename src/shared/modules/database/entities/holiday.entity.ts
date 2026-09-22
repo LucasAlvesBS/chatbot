@@ -1,10 +1,10 @@
 import { HolidaysType } from '@shared/enums';
 import { Column, Entity, Index } from 'typeorm';
 
-import { PartialBaseEntity } from './partialBase.entity';
+import { BaseEntity } from './base.entity';
 
 @Entity('holidays')
-export class Holiday extends PartialBaseEntity {
+export class Holiday extends BaseEntity {
   @Column({ type: 'date', nullable: false })
   date: Date;
 

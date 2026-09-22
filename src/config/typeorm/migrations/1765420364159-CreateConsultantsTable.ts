@@ -7,24 +7,24 @@ import {
   TableIndex,
 } from 'typeorm';
 
-const TABLE_NAMES = {
-  EVENTS: 'events',
-  DOCTORS: 'doctors',
-  PATIENTS: 'patients',
-};
+export class CreateConsultantsTable1765420364159 implements MigrationInterface {
+  private TABLE_NAMES = {
+    CONSULTANTS: 'consultants',
+    DOCTORS: 'doctors',
+    PATIENTS: 'patients',
+  };
 
-const COLUMN_NAMES = {
-  DOCTOR_ID: 'doctor_id',
-  PATIENT_ID: 'patient_id',
-  REFERENCE_ID: 'reference_id',
-  IDEMPOTENCY_KEY: 'idempotency_key',
-};
+  private COLUMN_NAMES = {
+    DOCTOR_ID: 'doctor_id',
+    PATIENT_ID: 'patient_id',
+    REFERENCE_ID: 'reference_id',
+    IDEMPOTENCY_KEY: 'idempotency_key',
+  };
 
-export class CreateEventsTable1765420364159 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: TABLE_NAMES.EVENTS,
+        name: this.TABLE_NAMES.CONSULTANTS,
         columns: [
           new TableColumn({
             name: 'id',
@@ -34,7 +34,7 @@ export class CreateEventsTable1765420364159 implements MigrationInterface {
             default: 'uuid_generate_v4()',
           }),
           new TableColumn({
-            name: COLUMN_NAMES.REFERENCE_ID,
+            name: this.COLUMN_NAMES.REFERENCE_ID,
             type: 'varchar',
             isNullable: false,
           }),
@@ -44,17 +44,17 @@ export class CreateEventsTable1765420364159 implements MigrationInterface {
             isNullable: false,
           }),
           new TableColumn({
-            name: COLUMN_NAMES.IDEMPOTENCY_KEY,
+            name: this.COLUMN_NAMES.IDEMPOTENCY_KEY,
             type: 'varchar',
             isNullable: false,
           }),
           new TableColumn({
-            name: COLUMN_NAMES.DOCTOR_ID,
+            name: this.COLUMN_NAMES.DOCTOR_ID,
             type: 'uuid',
             isNullable: false,
           }),
           new TableColumn({
-            name: COLUMN_NAMES.PATIENT_ID,
+            name: this.COLUMN_NAMES.PATIENT_ID,
             type: 'uuid',
             isNullable: false,
           }),
@@ -79,56 +79,59 @@ export class CreateEventsTable1765420364159 implements MigrationInterface {
       }),
     );
 
-    await queryRunner.createForeignKeys(TABLE_NAMES.EVENTS, [
+    await queryRunner.createForeignKeys(this.TABLE_NAMES.CONSULTANTS, [
       new TableForeignKey({
-        name: `FK_${TABLE_NAMES.EVENTS}_DOCTOR`.toUpperCase(),
-        columnNames: [COLUMN_NAMES.DOCTOR_ID],
+        name: `FK_${this.TABLE_NAMES.CONSULTANTS}_DOCTOR`.toUpperCase(),
+        columnNames: [this.COLUMN_NAMES.DOCTOR_ID],
         referencedColumnNames: ['id'],
-        referencedTableName: TABLE_NAMES.DOCTORS,
+        referencedTableName: this.TABLE_NAMES.DOCTORS,
         onDelete: 'NO ACTION',
       }),
       new TableForeignKey({
-        name: `FK_${TABLE_NAMES.EVENTS}_PATIENT`.toUpperCase(),
-        columnNames: [COLUMN_NAMES.PATIENT_ID],
+        name: `FK_${this.TABLE_NAMES.CONSULTANTS}_PATIENT`.toUpperCase(),
+        columnNames: [this.COLUMN_NAMES.PATIENT_ID],
         referencedColumnNames: ['id'],
-        referencedTableName: TABLE_NAMES.PATIENTS,
+        referencedTableName: this.TABLE_NAMES.PATIENTS,
         onDelete: 'NO ACTION',
       }),
     ]);
 
-    await queryRunner.createIndices(TABLE_NAMES.EVENTS, [
+    await queryRunner.createIndices(this.TABLE_NAMES.CONSULTANTS, [
       new TableIndex({
-        name: `IDX_${TABLE_NAMES.EVENTS}_DOCTOR_PATIENT`.toUpperCase(),
-        columnNames: [COLUMN_NAMES.DOCTOR_ID, COLUMN_NAMES.PATIENT_ID],
+        name: `IDX_${this.TABLE_NAMES.CONSULTANTS}_DOCTOR_PATIENT`.toUpperCase(),
+        columnNames: [
+          this.COLUMN_NAMES.DOCTOR_ID,
+          this.COLUMN_NAMES.PATIENT_ID,
+        ],
       }),
       new TableIndex({
-        name: `IDX_${TABLE_NAMES.EVENTS}_DOCTOR`.toUpperCase(),
-        columnNames: [COLUMN_NAMES.DOCTOR_ID],
+        name: `IDX_${this.TABLE_NAMES.CONSULTANTS}_DOCTOR`.toUpperCase(),
+        columnNames: [this.COLUMN_NAMES.DOCTOR_ID],
       }),
       new TableIndex({
-        name: `IDX_${TABLE_NAMES.EVENTS}_PATIENT`.toUpperCase(),
-        columnNames: [COLUMN_NAMES.PATIENT_ID],
+        name: `IDX_${this.TABLE_NAMES.CONSULTANTS}_PATIENT`.toUpperCase(),
+        columnNames: [this.COLUMN_NAMES.PATIENT_ID],
       }),
       new TableIndex({
-        name: `IDX_${TABLE_NAMES.EVENTS}_REFERENCE_ID`.toUpperCase(),
-        columnNames: [COLUMN_NAMES.REFERENCE_ID],
+        name: `IDX_${this.TABLE_NAMES.CONSULTANTS}_REFERENCE_ID`.toUpperCase(),
+        columnNames: [this.COLUMN_NAMES.REFERENCE_ID],
       }),
     ]);
 
     await queryRunner.query(`
-      CREATE UNIQUE INDEX "UQ_EVENTS_IDEMPOTENCY_KEY_ACTIVE"
-        ON "events" ("idempotency_key")
+      CREATE UNIQUE INDEX "UQ_CONSULTANTS_IDEMPOTENCY_KEY_ACTIVE"
+        ON "consultants" ("idempotency_key")
       WHERE "deleted_at" IS NULL;
     `);
 
     await queryRunner.query(`
-      CREATE UNIQUE INDEX "UQ_EVENTS_DOCTOR_ID_START_DATE_ACTIVE"
-        ON "events" ("doctor_id", "start_date")
+      CREATE UNIQUE INDEX "UQ_CONSULTANTS_DOCTOR_ID_START_DATE_ACTIVE"
+        ON "consultants" ("doctor_id", "start_date")
       WHERE "deleted_at" IS NULL;
     `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable(TABLE_NAMES.EVENTS, true, true, true);
+    await queryRunner.dropTable(this.TABLE_NAMES.CONSULTANTS, true, true, true);
   }
 }

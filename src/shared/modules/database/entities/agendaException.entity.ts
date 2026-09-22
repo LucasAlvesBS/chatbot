@@ -7,11 +7,11 @@ import {
   Relation,
 } from 'typeorm';
 
+import { BaseEntity } from './base.entity';
 import { Doctor } from './doctor.entity';
-import { PartialBaseEntity } from './partialBase.entity';
 
-@Entity('holidays')
-export class ExceptionalDay extends PartialBaseEntity {
+@Entity('agenda_exceptions')
+export class AgendaException extends BaseEntity {
   @Column({ type: 'date', nullable: false })
   date: Date;
 
@@ -27,7 +27,7 @@ export class ExceptionalDay extends PartialBaseEntity {
   @Index()
   doctorId: string;
 
-  @ManyToOne(() => Doctor, (doctor) => doctor.exceptionalDays)
+  @ManyToOne(() => Doctor, (doctor) => doctor.agendaExceptions)
   @JoinColumn({ name: 'doctor_id', referencedColumnName: 'id' })
   doctor: Relation<Doctor>;
 }

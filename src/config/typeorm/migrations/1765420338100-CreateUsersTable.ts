@@ -2,15 +2,16 @@ import {
   MigrationInterface,
   QueryRunner,
   Table,
-  TableCheck,
   TableColumn,
   TableIndex,
 } from 'typeorm';
 
-export class CreateHolidaysTable1769291843038 implements MigrationInterface {
-  private TABLE_NAME = 'holidays';
+export class CreateUsersTable1765420338100 implements MigrationInterface {
+  private TABLE_NAME = 'users';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";');
+
     await queryRunner.createTable(
       new Table({
         name: this.TABLE_NAME,
@@ -23,38 +24,19 @@ export class CreateHolidaysTable1769291843038 implements MigrationInterface {
             default: 'uuid_generate_v4()',
           }),
           new TableColumn({
-            name: 'date',
-            type: 'date',
-            isNullable: false,
-          }),
-          new TableColumn({
-            name: 'name',
+            name: 'phone',
             type: 'varchar',
             isNullable: false,
           }),
           new TableColumn({
-            name: 'type',
-            type: 'int',
-            isNullable: false,
-          }),
-          new TableColumn({
-            name: 'is_recurring',
+            name: 'is_blocked',
             type: 'boolean',
             isNullable: false,
+            default: false,
           }),
           new TableColumn({
-            name: 'country_code',
-            type: 'varchar',
-            isNullable: false,
-          }),
-          new TableColumn({
-            name: 'state_code',
-            type: 'varchar',
-            isNullable: true,
-          }),
-          new TableColumn({
-            name: 'city_code',
-            type: 'varchar',
+            name: 'blocked_until',
+            type: 'timestamp',
             isNullable: true,
           }),
           new TableColumn({
@@ -78,25 +60,13 @@ export class CreateHolidaysTable1769291843038 implements MigrationInterface {
       }),
     );
 
-    await queryRunner.createCheckConstraint(
+    await queryRunner.createIndex(
       this.TABLE_NAME,
-      new TableCheck({
-        columnNames: ['type'],
-        expression: 'type >= 0 AND type < 3',
-        name: `CK_${this.TABLE_NAME}_valid_type`.toUpperCase(),
+      new TableIndex({
+        name: `IDX_${this.TABLE_NAME}_PHONE`.toUpperCase(),
+        columnNames: ['phone'],
       }),
     );
-
-    await queryRunner.createIndices(this.TABLE_NAME, [
-      new TableIndex({
-        name: `IDX_${this.TABLE_NAME}_type`.toUpperCase(),
-        columnNames: ['type'],
-      }),
-      new TableIndex({
-        name: `IDX_${this.TABLE_NAME}_is_recurring`.toUpperCase(),
-        columnNames: ['is_recurring'],
-      }),
-    ]);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
