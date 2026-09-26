@@ -17,11 +17,11 @@ export class AgendaException extends BaseEntity {
 
   @Column({ name: 'start_date', type: 'timestamp', nullable: false })
   @Index()
-  startDate: string;
+  startDate: Date;
 
   @Column({ name: 'end_date', type: 'timestamp', nullable: false })
   @Index()
-  endDate: string;
+  endDate: Date;
 
   @Column({ name: 'doctor_id', type: 'varchar', nullable: false })
   @Index()

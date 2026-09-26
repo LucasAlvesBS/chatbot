@@ -10,7 +10,7 @@ import {
 import { BaseEntity } from './base.entity';
 import { Doctor } from './doctor.entity';
 
-@Entity('agenda_exceptions')
+@Entity('doctor_schedules')
 export class DoctorSchedule extends BaseEntity {
   @Column({ name: 'day_of_week', type: 'varchar', nullable: false })
   dayOfWeek: string;

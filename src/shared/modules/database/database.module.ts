@@ -5,8 +5,11 @@ import { DataSource } from 'typeorm';
 
 import { IDatabaseProviders } from './interfaces';
 import {
+  AgendaExceptionRepository,
   ConsultationRepository,
   DoctorRepository,
+  DoctorScheduleRepository,
+  HolidayRepository,
   PatientRepository,
 } from './repositories';
 
@@ -23,8 +26,13 @@ const databaseProviders: Provider[] = [
 
         return {
           repositories: {
+            agendaExceptionRepository: new AgendaExceptionRepository(
+              dataSource,
+            ),
             consultationRepository: new ConsultationRepository(dataSource),
             doctorRepository: new DoctorRepository(dataSource),
+            doctorScheduleRepository: new DoctorScheduleRepository(dataSource),
+            holidayRepository: new HolidayRepository(dataSource),
             patientRepository: new PatientRepository(dataSource),
           },
         };
