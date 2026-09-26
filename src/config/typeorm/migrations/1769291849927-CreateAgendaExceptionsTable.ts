@@ -10,15 +10,15 @@ import {
 export class CreateAgendaExceptionsTable1769291849927
   implements MigrationInterface
 {
-  private TABLE_NAMES = {
-    AGENDA_EXCEPTIONS: 'agenda_exceptions',
-    DOCTORS: 'doctors',
+  private tableNames = {
+    agendaExceptions: 'agenda_exceptions',
+    doctors: 'doctors',
   };
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: this.TABLE_NAMES.AGENDA_EXCEPTIONS,
+        name: this.tableNames.agendaExceptions,
         columns: [
           new TableColumn({
             name: 'id',
@@ -64,31 +64,31 @@ export class CreateAgendaExceptionsTable1769291849927
     );
 
     await queryRunner.createForeignKey(
-      this.TABLE_NAMES.AGENDA_EXCEPTIONS,
+      this.tableNames.agendaExceptions,
       new TableForeignKey({
-        name: `FK_${this.TABLE_NAMES.AGENDA_EXCEPTIONS}_DOCTOR`.toUpperCase(),
+        name: `FK_${this.tableNames.agendaExceptions}_DOCTOR`.toUpperCase(),
         columnNames: ['doctor_id'],
         referencedColumnNames: ['id'],
-        referencedTableName: this.TABLE_NAMES.DOCTORS,
+        referencedTableName: this.tableNames.doctors,
         onDelete: 'CASCADE',
       }),
     );
 
-    await queryRunner.createIndices(this.TABLE_NAMES.AGENDA_EXCEPTIONS, [
+    await queryRunner.createIndices(this.tableNames.agendaExceptions, [
       new TableIndex({
-        name: `IDX_${this.TABLE_NAMES.AGENDA_EXCEPTIONS}_START_DATE_END_DATE`.toUpperCase(),
+        name: `IDX_${this.tableNames.agendaExceptions}_START_DATE_END_DATE`.toUpperCase(),
         columnNames: ['start_date', 'end_date'],
       }),
       new TableIndex({
-        name: `IDX_${this.TABLE_NAMES.AGENDA_EXCEPTIONS}_START_DATE`.toUpperCase(),
+        name: `IDX_${this.tableNames.agendaExceptions}_START_DATE`.toUpperCase(),
         columnNames: ['start_date'],
       }),
       new TableIndex({
-        name: `IDX_${this.TABLE_NAMES.AGENDA_EXCEPTIONS}_END_DATE`.toUpperCase(),
+        name: `IDX_${this.tableNames.agendaExceptions}_END_DATE`.toUpperCase(),
         columnNames: ['end_date'],
       }),
       new TableIndex({
-        name: `IDX_${this.TABLE_NAMES.AGENDA_EXCEPTIONS}_DOCTOR`.toUpperCase(),
+        name: `IDX_${this.tableNames.agendaExceptions}_DOCTOR`.toUpperCase(),
         columnNames: ['doctor_id'],
       }),
     ]);
@@ -96,7 +96,7 @@ export class CreateAgendaExceptionsTable1769291849927
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropTable(
-      this.TABLE_NAMES.AGENDA_EXCEPTIONS,
+      this.tableNames.agendaExceptions,
       true,
       true,
       true,

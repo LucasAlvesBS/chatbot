@@ -10,12 +10,12 @@ import {
 export class CreateUsersPatientsTable1765420357849
   implements MigrationInterface
 {
-  private TABLE_NAME = 'users_patients';
+  private tableName = 'users_patients';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: this.TABLE_NAME,
+        name: this.tableName,
         columns: [
           new TableColumn({
             name: 'id',
@@ -55,16 +55,16 @@ export class CreateUsersPatientsTable1765420357849
       }),
     );
 
-    await queryRunner.createForeignKeys(this.TABLE_NAME, [
+    await queryRunner.createForeignKeys(this.tableName, [
       new TableForeignKey({
-        name: `FK_${this.TABLE_NAME}_USER`.toUpperCase(),
+        name: `FK_${this.tableName}_USER`.toUpperCase(),
         columnNames: ['user_id'],
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'NO ACTION',
       }),
       new TableForeignKey({
-        name: `FK_${this.TABLE_NAME}_PATIENT`.toUpperCase(),
+        name: `FK_${this.tableName}_PATIENT`.toUpperCase(),
         columnNames: ['patient_id'],
         referencedColumnNames: ['id'],
         referencedTableName: 'patients',
@@ -72,23 +72,23 @@ export class CreateUsersPatientsTable1765420357849
       }),
     ]);
 
-    await queryRunner.createIndices(this.TABLE_NAME, [
+    await queryRunner.createIndices(this.tableName, [
       new TableIndex({
-        name: `IDX_${this.TABLE_NAME}_USER_PATIENT`.toUpperCase(),
+        name: `IDX_${this.tableName}_USER_PATIENT`.toUpperCase(),
         columnNames: ['user_id', 'patient_id'],
       }),
       new TableIndex({
-        name: `IDX_${this.TABLE_NAME}_USER`.toUpperCase(),
+        name: `IDX_${this.tableName}_USER`.toUpperCase(),
         columnNames: ['user_id'],
       }),
       new TableIndex({
-        name: `IDX_${this.TABLE_NAME}_PATIENT`.toUpperCase(),
+        name: `IDX_${this.tableName}_PATIENT`.toUpperCase(),
         columnNames: ['patient_id'],
       }),
     ]);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable(this.TABLE_NAME, true, true, true);
+    await queryRunner.dropTable(this.tableName, true, true, true);
   }
 }

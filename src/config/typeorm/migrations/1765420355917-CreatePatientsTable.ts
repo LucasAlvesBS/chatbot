@@ -7,12 +7,12 @@ import {
 } from 'typeorm';
 
 export class CreatePatientsTable1765420355917 implements MigrationInterface {
-  private TABLE_NAME = 'patients';
+  private tableName = 'patients';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: this.TABLE_NAME,
+        name: this.tableName,
         columns: [
           new TableColumn({
             name: 'id',
@@ -54,15 +54,15 @@ export class CreatePatientsTable1765420355917 implements MigrationInterface {
     );
 
     await queryRunner.createIndex(
-      this.TABLE_NAME,
+      this.tableName,
       new TableIndex({
-        name: `IDX_${this.TABLE_NAME}_DOCUMENT_NUMBER`.toUpperCase(),
+        name: `IDX_${this.tableName}_DOCUMENT_NUMBER`.toUpperCase(),
         columnNames: ['document_number'],
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable(this.TABLE_NAME, true, true, true);
+    await queryRunner.dropTable(this.tableName, true, true, true);
   }
 }

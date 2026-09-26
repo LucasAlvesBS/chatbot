@@ -8,23 +8,23 @@ import {
 } from 'typeorm';
 
 export class CreateConsultantsTable1765420364159 implements MigrationInterface {
-  private TABLE_NAMES = {
-    CONSULTANTS: 'consultants',
-    DOCTORS: 'doctors',
-    PATIENTS: 'patients',
+  private tableNames = {
+    consultants: 'consultants',
+    doctors: 'doctors',
+    patients: 'patients',
   };
 
-  private COLUMN_NAMES = {
-    DOCTOR_ID: 'doctor_id',
-    PATIENT_ID: 'patient_id',
-    REFERENCE_ID: 'reference_id',
-    IDEMPOTENCY_KEY: 'idempotency_key',
+  private columnNames = {
+    doctorId: 'doctor_id',
+    patientId: 'patient_id',
+    referenceId: 'reference_id',
+    idempotencyKey: 'idempotency_key',
   };
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: this.TABLE_NAMES.CONSULTANTS,
+        name: this.tableNames.consultants,
         columns: [
           new TableColumn({
             name: 'id',
@@ -34,7 +34,7 @@ export class CreateConsultantsTable1765420364159 implements MigrationInterface {
             default: 'uuid_generate_v4()',
           }),
           new TableColumn({
-            name: this.COLUMN_NAMES.REFERENCE_ID,
+            name: this.columnNames.referenceId,
             type: 'varchar',
             isNullable: false,
           }),
@@ -44,17 +44,17 @@ export class CreateConsultantsTable1765420364159 implements MigrationInterface {
             isNullable: false,
           }),
           new TableColumn({
-            name: this.COLUMN_NAMES.IDEMPOTENCY_KEY,
+            name: this.columnNames.idempotencyKey,
             type: 'varchar',
             isNullable: false,
           }),
           new TableColumn({
-            name: this.COLUMN_NAMES.DOCTOR_ID,
+            name: this.columnNames.doctorId,
             type: 'uuid',
             isNullable: false,
           }),
           new TableColumn({
-            name: this.COLUMN_NAMES.PATIENT_ID,
+            name: this.columnNames.patientId,
             type: 'uuid',
             isNullable: false,
           }),
@@ -79,42 +79,39 @@ export class CreateConsultantsTable1765420364159 implements MigrationInterface {
       }),
     );
 
-    await queryRunner.createForeignKeys(this.TABLE_NAMES.CONSULTANTS, [
+    await queryRunner.createForeignKeys(this.tableNames.consultants, [
       new TableForeignKey({
-        name: `FK_${this.TABLE_NAMES.CONSULTANTS}_DOCTOR`.toUpperCase(),
-        columnNames: [this.COLUMN_NAMES.DOCTOR_ID],
+        name: `FK_${this.tableNames.consultants}_DOCTOR`.toUpperCase(),
+        columnNames: [this.columnNames.doctorId],
         referencedColumnNames: ['id'],
-        referencedTableName: this.TABLE_NAMES.DOCTORS,
+        referencedTableName: this.tableNames.doctors,
         onDelete: 'NO ACTION',
       }),
       new TableForeignKey({
-        name: `FK_${this.TABLE_NAMES.CONSULTANTS}_PATIENT`.toUpperCase(),
-        columnNames: [this.COLUMN_NAMES.PATIENT_ID],
+        name: `FK_${this.tableNames.consultants}_PATIENT`.toUpperCase(),
+        columnNames: [this.columnNames.patientId],
         referencedColumnNames: ['id'],
-        referencedTableName: this.TABLE_NAMES.PATIENTS,
+        referencedTableName: this.tableNames.patients,
         onDelete: 'NO ACTION',
       }),
     ]);
 
-    await queryRunner.createIndices(this.TABLE_NAMES.CONSULTANTS, [
+    await queryRunner.createIndices(this.tableNames.consultants, [
       new TableIndex({
-        name: `IDX_${this.TABLE_NAMES.CONSULTANTS}_DOCTOR_PATIENT`.toUpperCase(),
-        columnNames: [
-          this.COLUMN_NAMES.DOCTOR_ID,
-          this.COLUMN_NAMES.PATIENT_ID,
-        ],
+        name: `IDX_${this.tableNames.consultants}_DOCTOR_PATIENT`.toUpperCase(),
+        columnNames: [this.columnNames.doctorId, this.columnNames.patientId],
       }),
       new TableIndex({
-        name: `IDX_${this.TABLE_NAMES.CONSULTANTS}_DOCTOR`.toUpperCase(),
-        columnNames: [this.COLUMN_NAMES.DOCTOR_ID],
+        name: `IDX_${this.tableNames.consultants}_DOCTOR`.toUpperCase(),
+        columnNames: [this.columnNames.doctorId],
       }),
       new TableIndex({
-        name: `IDX_${this.TABLE_NAMES.CONSULTANTS}_PATIENT`.toUpperCase(),
-        columnNames: [this.COLUMN_NAMES.PATIENT_ID],
+        name: `IDX_${this.tableNames.consultants}_PATIENT`.toUpperCase(),
+        columnNames: [this.columnNames.patientId],
       }),
       new TableIndex({
-        name: `IDX_${this.TABLE_NAMES.CONSULTANTS}_REFERENCE_ID`.toUpperCase(),
-        columnNames: [this.COLUMN_NAMES.REFERENCE_ID],
+        name: `IDX_${this.tableNames.consultants}_${this.columnNames.referenceId}`.toUpperCase(),
+        columnNames: [this.columnNames.referenceId],
       }),
     ]);
 
@@ -132,6 +129,6 @@ export class CreateConsultantsTable1765420364159 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable(this.TABLE_NAMES.CONSULTANTS, true, true, true);
+    await queryRunner.dropTable(this.tableNames.consultants, true, true, true);
   }
 }

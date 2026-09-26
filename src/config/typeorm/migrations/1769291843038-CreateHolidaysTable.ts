@@ -8,12 +8,12 @@ import {
 } from 'typeorm';
 
 export class CreateHolidaysTable1769291843038 implements MigrationInterface {
-  private TABLE_NAME = 'holidays';
+  private tableName = 'holidays';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: this.TABLE_NAME,
+        name: this.tableName,
         columns: [
           new TableColumn({
             name: 'id',
@@ -79,27 +79,27 @@ export class CreateHolidaysTable1769291843038 implements MigrationInterface {
     );
 
     await queryRunner.createCheckConstraint(
-      this.TABLE_NAME,
+      this.tableName,
       new TableCheck({
         columnNames: ['type'],
         expression: 'type >= 0 AND type < 3',
-        name: `CK_${this.TABLE_NAME}_valid_type`.toUpperCase(),
+        name: `CK_${this.tableName}_valid_type`.toUpperCase(),
       }),
     );
 
-    await queryRunner.createIndices(this.TABLE_NAME, [
+    await queryRunner.createIndices(this.tableName, [
       new TableIndex({
-        name: `IDX_${this.TABLE_NAME}_type`.toUpperCase(),
+        name: `IDX_${this.tableName}_type`.toUpperCase(),
         columnNames: ['type'],
       }),
       new TableIndex({
-        name: `IDX_${this.TABLE_NAME}_is_recurring`.toUpperCase(),
+        name: `IDX_${this.tableName}_is_recurring`.toUpperCase(),
         columnNames: ['is_recurring'],
       }),
     ]);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable(this.TABLE_NAME, true, true, true);
+    await queryRunner.dropTable(this.tableName, true, true, true);
   }
 }

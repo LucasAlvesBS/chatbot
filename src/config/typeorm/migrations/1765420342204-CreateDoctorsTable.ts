@@ -8,12 +8,12 @@ import {
 } from 'typeorm';
 
 export class CreateDoctorsTable1765420342204 implements MigrationInterface {
-  private TABLE_NAME = 'doctors';
+  private tableName = 'doctors';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: this.TABLE_NAME,
+        name: this.tableName,
         columns: [
           new TableColumn({
             name: 'id',
@@ -60,9 +60,9 @@ export class CreateDoctorsTable1765420342204 implements MigrationInterface {
     );
 
     await queryRunner.createForeignKey(
-      this.TABLE_NAME,
+      this.tableName,
       new TableForeignKey({
-        name: `FK_${this.TABLE_NAME}_USER`.toUpperCase(),
+        name: `FK_${this.tableName}_USER`.toUpperCase(),
         columnNames: ['user_id'],
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
@@ -70,19 +70,19 @@ export class CreateDoctorsTable1765420342204 implements MigrationInterface {
       }),
     );
 
-    await queryRunner.createIndices(this.TABLE_NAME, [
+    await queryRunner.createIndices(this.tableName, [
       new TableIndex({
-        name: `IDX_${this.TABLE_NAME}_REGISTRATION_NUMBER`.toUpperCase(),
+        name: `IDX_${this.tableName}_REGISTRATION_NUMBER`.toUpperCase(),
         columnNames: ['registration_number'],
       }),
       new TableIndex({
-        name: `IDX_${this.TABLE_NAME}_USER`.toUpperCase(),
+        name: `IDX_${this.tableName}_USER`.toUpperCase(),
         columnNames: ['user_id'],
       }),
     ]);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable(this.TABLE_NAME, true, true, true);
+    await queryRunner.dropTable(this.tableName, true, true, true);
   }
 }

@@ -7,14 +7,14 @@ import {
 } from 'typeorm';
 
 export class CreateUsersTable1765420338100 implements MigrationInterface {
-  private TABLE_NAME = 'users';
+  private tableName = 'users';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";');
 
     await queryRunner.createTable(
       new Table({
-        name: this.TABLE_NAME,
+        name: this.tableName,
         columns: [
           new TableColumn({
             name: 'id',
@@ -61,15 +61,15 @@ export class CreateUsersTable1765420338100 implements MigrationInterface {
     );
 
     await queryRunner.createIndex(
-      this.TABLE_NAME,
+      this.tableName,
       new TableIndex({
-        name: `IDX_${this.TABLE_NAME}_PHONE`.toUpperCase(),
+        name: `IDX_${this.tableName}_PHONE`.toUpperCase(),
         columnNames: ['phone'],
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable(this.TABLE_NAME, true, true, true);
+    await queryRunner.dropTable(this.tableName, true, true, true);
   }
 }
