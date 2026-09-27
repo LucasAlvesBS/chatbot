@@ -1,26 +1,55 @@
-import env from '@config/env';
-import { Injectable } from '@nestjs/common';
-import { STATES, WHATSAPP_LISTS, WHATSAPP_MESSAGES } from '@shared/constants';
+import { Inject, Injectable } from '@nestjs/common';
+import {
+  CALENDAR_PARAMETER,
+  DATE_PARAMETER,
+  DOCTOR_REGISTRATION_NUMBER,
+  NOT_FOUND,
+  PROVIDERS,
+  STATES,
+  WHATSAPP_LISTS,
+  WHATSAPP_MESSAGES,
+} from '@shared/constants';
+import { nowInBrazil } from '@shared/helpers';
 import { IMonthYear } from '@shared/interfaces';
-import { GetAvailableMonthsInCalendarService } from '@shared/providers/calendars';
-import { SendInteractiveListsMessageService } from '@shared/providers/whatsApp';
+import { IDatabaseProviders } from '@shared/modules/database/interfaces';
+import {
+  SendInteractiveListsMessageService,
+  SendTextMessageService,
+} from '@shared/providers/whatsApp';
 import { SetStateInSessionService } from '@shared/redis/session';
+import { AppLogger } from '@shared/utils';
+
+import { GetAvailableDaysHelper } from '../helpers';
 
 @Injectable()
 export class SelectMonthViaWhatsAppService {
   constructor(
+    @Inject(PROVIDERS.DATABASE_PROVIDER)
+    private readonly db: IDatabaseProviders,
     private readonly sendInteractiveListsMessageService: SendInteractiveListsMessageService,
+    private readonly sendTextMessageService: SendTextMessageService,
     private readonly setStateInSession: SetStateInSessionService,
-    private readonly getAvailableMonthsInCalendarService: GetAvailableMonthsInCalendarService,
+    private readonly getAvailableDaysHelper: GetAvailableDaysHelper,
   ) {}
 
   async execute(phoneNumber: string, userName: string): Promise<void> {
     const allMonths = WHATSAPP_LISTS.month;
 
-    const availableMonths =
-      await this.getAvailableMonthsInCalendarService.execute(
-        env().google.calendarId as string,
+    const doctor =
+      await this.db.repositories.doctorRepository.getByRegistrationNumber(
+        DOCTOR_REGISTRATION_NUMBER,
       );
+
+    if (!doctor) {
+      AppLogger.error(NOT_FOUND('Doctor'));
+
+      return this.sendTextMessageService.execute({
+        to: phoneNumber,
+        message: WHATSAPP_MESSAGES.errors.default,
+      });
+    }
+
+    const availableMonths = await this.getAvailableMonths(doctor.id);
 
     const filteredMonthRows = this.filterRowsFromAvailableMonths(
       allMonths.section.rows,
@@ -45,6 +74,38 @@ export class SelectMonthViaWhatsAppService {
       state: STATES.SELECTED_MONTH,
       userName: userName.trim(),
     });
+  }
+
+  private async getAvailableMonths(doctorId: string): Promise<IMonthYear[]> {
+    const currentDate = nowInBrazil();
+    const availableMonths: IMonthYear[] = [];
+    let cursor = 0;
+
+    while (
+      availableMonths.length < CALENDAR_PARAMETER.MONTHS_TO_DISPLAY &&
+      cursor < CALENDAR_PARAMETER.NUMBER_OF_MONTHS_TO_CHECK_AVAILABILITY
+    ) {
+      const monthDate = currentDate.plus({ months: cursor });
+      const month = monthDate.toFormat(DATE_PARAMETER.MONTH_NUMBER_FORMAT);
+      const year = monthDate.year;
+
+      const hasAvailableDays = await this.getAvailableDaysHelper.execute(
+        doctorId,
+        month,
+        year.toString(),
+      );
+
+      if (hasAvailableDays) {
+        availableMonths.push({
+          month,
+          year,
+        });
+      }
+
+      cursor++;
+    }
+
+    return availableMonths;
   }
 
   private filterRowsFromAvailableMonths(

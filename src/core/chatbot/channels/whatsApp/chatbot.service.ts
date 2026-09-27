@@ -59,19 +59,21 @@ export class WhatsAppChatbotService {
       case STATES.REQUESTED_USER_NAME:
         return this.selectMonthViaWhatsAppService.execute(
           senderPhoneNumber,
-          message as string,
+          (message ?? userName) as string,
         );
 
       case STATES.SELECTED_MONTH:
         return this.selectDayViaWhatsAppService.execute(
           senderPhoneNumber,
           replyId as string,
+          userName as string,
         );
 
       case STATES.SELECTED_DAY:
         return this.selectHourViaWhatsAppService.execute(
           senderPhoneNumber,
           replyId as string,
+          userName as string,
         );
 
       case STATES.SELECTED_HOUR:

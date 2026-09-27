@@ -1,5 +1,6 @@
 export * from './channels.enum';
 export * from './codes.enum';
+export * from './dayOfWeek.enum';
 export * from './envs.enum';
 export * from './holidays.enum';
 export * from './languages.enum';

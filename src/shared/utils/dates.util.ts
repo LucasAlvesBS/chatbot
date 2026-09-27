@@ -20,3 +20,7 @@ export function formatDateWithLuxon(startDate: Date) {
 
   return i18nArgs;
 }
+
+export function setToDateTime(date: Date): DateTime {
+  return DateTime.fromJSDate(date);
+}

@@ -9,7 +9,6 @@ import {
   PROVIDERS,
   QUEUE_NAMES,
   REGISTERING_EVENT_FOR,
-  REGISTRATION_FAILED,
   WHATSAPP_MESSAGES,
 } from '@shared/constants';
 import { IDatabaseProviders } from '@shared/modules/database/interfaces';
@@ -168,12 +167,15 @@ export class RegisterEventsConsumer {
   async onFailed(job: Job<RegisterEventConsumerRequest>, error: Error) {
     const { phoneNumber } = job.data;
 
-    this.logger.error(REGISTRATION_FAILED(phoneNumber, error?.message));
-
     const totalAttempts = job.opts.attempts ?? 1;
-    const isLastAttempt = job.attemptsMade + 1 >= totalAttempts;
 
-    if (!isLastAttempt) {
+    this.logger.error(
+      `Registration failed for ${phoneNumber}. ` +
+        `Attempt ${job.attemptsMade}/${totalAttempts}. ` +
+        `Error: ${error?.message}`,
+    );
+
+    if (job.attemptsMade < totalAttempts) {
       return;
     }
 

@@ -1,7 +1,9 @@
-import env from '@config/env';
 import { WhatsAppChatbotService } from '@core/chatbot/channels/whatsApp';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import {
+  DOCTOR_REGISTRATION_NUMBER,
+  NOT_FOUND,
+  PROVIDERS,
   REPLY_IDS,
   STATES,
   WHATSAPP_LISTS,
@@ -10,22 +12,30 @@ import {
 } from '@shared/constants';
 import { buildWhatsAppRows } from '@shared/helpers';
 import { IRowStructure } from '@shared/interfaces';
-import { GetAvailableHoursInCalendarService } from '@shared/providers/calendars';
-import { SendInteractiveListsMessageService } from '@shared/providers/whatsApp';
+import { IDatabaseProviders } from '@shared/modules/database/interfaces';
+import {
+  SendInteractiveListsMessageService,
+  SendTextMessageService,
+} from '@shared/providers/whatsApp';
 import { SetStateInSessionService } from '@shared/redis/session';
-import { formatPadStart } from '@shared/utils';
+import { AppLogger, formatPadStart } from '@shared/utils';
+
+import { GetAvailableHoursHelper } from '../helpers';
 
 @Injectable()
 export class SelectHourViaWhatsAppService {
   constructor(
+    @Inject(PROVIDERS.DATABASE_PROVIDER)
+    private readonly db: IDatabaseProviders,
     @Inject(forwardRef(() => WhatsAppChatbotService))
     private readonly whatsAppChatbotService: WhatsAppChatbotService,
     private readonly sendList: SendInteractiveListsMessageService,
-    private readonly getAvailableHoursInCalendarService: GetAvailableHoursInCalendarService,
+    private readonly sendTextMessageService: SendTextMessageService,
+    private readonly getAvailableHoursHelper: GetAvailableHoursHelper,
     private readonly setState: SetStateInSessionService,
   ) {}
 
-  async execute(phoneNumber: string, replyId: string) {
+  async execute(phoneNumber: string, replyId: string, userName: string) {
     if (replyId.startsWith(REPLY_IDS.DAY)) {
       const [, day, month, year] = replyId.split('_');
       return this.sendHoursList(phoneNumber, day, month, year);
@@ -42,6 +52,11 @@ export class SelectHourViaWhatsAppService {
     }
 
     if (replyId.startsWith(REPLY_IDS.MONTH)) {
+      await this.setState.execute(phoneNumber, {
+        state: STATES.SELECTED_MONTH,
+        userName,
+      });
+
       return this.whatsAppChatbotService.execute({
         senderPhoneNumber: phoneNumber,
         replyId,
@@ -66,13 +81,26 @@ export class SelectHourViaWhatsAppService {
   ) {
     const page = pageToken ? Number(pageToken.replace('p', '')) : 1;
 
-    const availableHours =
-      await this.getAvailableHoursInCalendarService.execute(
-        env().google.calendarId as string,
-        day,
-        month,
-        year,
+    const doctor =
+      await this.db.repositories.doctorRepository.getByRegistrationNumber(
+        DOCTOR_REGISTRATION_NUMBER,
       );
+
+    if (!doctor) {
+      AppLogger.error(NOT_FOUND('Doctor'));
+
+      return this.sendTextMessageService.execute({
+        to: phoneNumber,
+        message: WHATSAPP_MESSAGES.errors.default,
+      });
+    }
+
+    const availableHours = await this.getAvailableHoursHelper.execute(
+      doctor.id,
+      day,
+      month,
+      year,
+    );
 
     const rows = this.buildRows(availableHours, day, month, year, page);
 

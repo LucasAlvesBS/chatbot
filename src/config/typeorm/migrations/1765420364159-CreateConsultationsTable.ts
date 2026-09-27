@@ -7,9 +7,11 @@ import {
   TableIndex,
 } from 'typeorm';
 
-export class CreateConsultantsTable1765420364159 implements MigrationInterface {
+export class CreateConsultationsTable1765420364159
+  implements MigrationInterface
+{
   private tableNames = {
-    consultants: 'consultants',
+    consultations: 'consultations',
     doctors: 'doctors',
     patients: 'patients',
   };
@@ -24,7 +26,7 @@ export class CreateConsultantsTable1765420364159 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: this.tableNames.consultants,
+        name: this.tableNames.consultations,
         columns: [
           new TableColumn({
             name: 'id',
@@ -79,16 +81,16 @@ export class CreateConsultantsTable1765420364159 implements MigrationInterface {
       }),
     );
 
-    await queryRunner.createForeignKeys(this.tableNames.consultants, [
+    await queryRunner.createForeignKeys(this.tableNames.consultations, [
       new TableForeignKey({
-        name: `FK_${this.tableNames.consultants}_DOCTOR`.toUpperCase(),
+        name: `FK_${this.tableNames.consultations}_DOCTOR`.toUpperCase(),
         columnNames: [this.columnNames.doctorId],
         referencedColumnNames: ['id'],
         referencedTableName: this.tableNames.doctors,
         onDelete: 'NO ACTION',
       }),
       new TableForeignKey({
-        name: `FK_${this.tableNames.consultants}_PATIENT`.toUpperCase(),
+        name: `FK_${this.tableNames.consultations}_PATIENT`.toUpperCase(),
         columnNames: [this.columnNames.patientId],
         referencedColumnNames: ['id'],
         referencedTableName: this.tableNames.patients,
@@ -96,39 +98,44 @@ export class CreateConsultantsTable1765420364159 implements MigrationInterface {
       }),
     ]);
 
-    await queryRunner.createIndices(this.tableNames.consultants, [
+    await queryRunner.createIndices(this.tableNames.consultations, [
       new TableIndex({
-        name: `IDX_${this.tableNames.consultants}_DOCTOR_PATIENT`.toUpperCase(),
+        name: `IDX_${this.tableNames.consultations}_DOCTOR_PATIENT`.toUpperCase(),
         columnNames: [this.columnNames.doctorId, this.columnNames.patientId],
       }),
       new TableIndex({
-        name: `IDX_${this.tableNames.consultants}_DOCTOR`.toUpperCase(),
+        name: `IDX_${this.tableNames.consultations}_DOCTOR`.toUpperCase(),
         columnNames: [this.columnNames.doctorId],
       }),
       new TableIndex({
-        name: `IDX_${this.tableNames.consultants}_PATIENT`.toUpperCase(),
+        name: `IDX_${this.tableNames.consultations}_PATIENT`.toUpperCase(),
         columnNames: [this.columnNames.patientId],
       }),
       new TableIndex({
-        name: `IDX_${this.tableNames.consultants}_${this.columnNames.referenceId}`.toUpperCase(),
+        name: `IDX_${this.tableNames.consultations}_${this.columnNames.referenceId}`.toUpperCase(),
         columnNames: [this.columnNames.referenceId],
       }),
     ]);
 
     await queryRunner.query(`
-      CREATE UNIQUE INDEX "UQ_CONSULTANTS_IDEMPOTENCY_KEY_ACTIVE"
-        ON "consultants" ("idempotency_key")
+      CREATE UNIQUE INDEX "UQ_CONSULTATIONS_IDEMPOTENCY_KEY_ACTIVE"
+        ON "consultations" ("idempotency_key")
       WHERE "deleted_at" IS NULL;
     `);
 
     await queryRunner.query(`
-      CREATE UNIQUE INDEX "UQ_CONSULTANTS_DOCTOR_ID_START_DATE_ACTIVE"
-        ON "consultants" ("doctor_id", "start_date")
+      CREATE UNIQUE INDEX "UQ_CONSULTATIONS_DOCTOR_ID_START_DATE_ACTIVE"
+        ON "consultations" ("doctor_id", "start_date")
       WHERE "deleted_at" IS NULL;
     `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable(this.tableNames.consultants, true, true, true);
+    await queryRunner.dropTable(
+      this.tableNames.consultations,
+      true,
+      true,
+      true,
+    );
   }
 }

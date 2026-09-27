@@ -20,6 +20,10 @@ import {
   SelectMonthViaWhatsAppService,
   SendWelcomeMenuViaWhatsAppService,
 } from './flows/whatsApp';
+import {
+  GetAvailableDaysHelper,
+  GetAvailableHoursHelper,
+} from './flows/whatsApp/helpers';
 
 @Module({
   imports: [
@@ -41,6 +45,8 @@ import {
     ConfirmCancellationOfEventViaWhatsAppService,
     CancelEventViaWhatsAppService,
     ProvideHumanSupportViaWhatsAppService,
+    GetAvailableDaysHelper,
+    GetAvailableHoursHelper,
   ],
   exports: [WhatsAppChatbotService],
 })

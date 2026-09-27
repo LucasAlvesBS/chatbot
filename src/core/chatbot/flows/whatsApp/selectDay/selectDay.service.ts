@@ -1,7 +1,9 @@
-import env from '@config/env';
 import { WhatsAppChatbotService } from '@core/chatbot/channels/whatsApp';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import {
+  DOCTOR_REGISTRATION_NUMBER,
+  NOT_FOUND,
+  PROVIDERS,
   REPLY_IDS,
   STATES,
   WHATSAPP_LISTS,
@@ -10,22 +12,34 @@ import {
 } from '@shared/constants';
 import { buildWhatsAppRows } from '@shared/helpers';
 import { IRowStructure, IWeekday } from '@shared/interfaces';
-import { GetAvailableDaysInCalendarService } from '@shared/providers/calendars';
-import { SendInteractiveListsMessageService } from '@shared/providers/whatsApp';
+import { IDatabaseProviders } from '@shared/modules/database/interfaces';
+import {
+  SendInteractiveListsMessageService,
+  SendTextMessageService,
+} from '@shared/providers/whatsApp';
 import { SetStateInSessionService } from '@shared/redis/session';
-import { formatPadStart } from '@shared/utils';
+import { AppLogger, formatPadStart } from '@shared/utils';
+
+import { GetAvailableDaysHelper } from '../helpers';
 
 @Injectable()
 export class SelectDayViaWhatsAppService {
   constructor(
+    @Inject(PROVIDERS.DATABASE_PROVIDER)
+    private readonly db: IDatabaseProviders,
     @Inject(forwardRef(() => WhatsAppChatbotService))
     private readonly whatsAppChatbotService: WhatsAppChatbotService,
     private readonly sendInteractiveListsMessageService: SendInteractiveListsMessageService,
+    private readonly sendTextMessageService: SendTextMessageService,
     private readonly setStateInSession: SetStateInSessionService,
-    private readonly getAvailableDaysInCalendarService: GetAvailableDaysInCalendarService,
+    private readonly getAvailableDaysHelper: GetAvailableDaysHelper,
   ) {}
 
-  async execute(phoneNumber: string, replyId: string): Promise<void> {
+  async execute(
+    phoneNumber: string,
+    replyId: string,
+    userName: string,
+  ): Promise<void> {
     if (replyId.startsWith(REPLY_IDS.MONTH)) {
       const [, month, year] = replyId.split('_');
       return this.sendDaysList(phoneNumber, month, year);
@@ -46,9 +60,13 @@ export class SelectDayViaWhatsAppService {
     const dayMonth = WHATSAPP_LISTS.day.section.defaultRows.changeMonth;
 
     if (replyId === dayMonth.id) {
+      await this.setStateInSession.execute(phoneNumber, {
+        state: STATES.REQUESTED_USER_NAME,
+        userName,
+      });
+
       return this.whatsAppChatbotService.execute({
         senderPhoneNumber: phoneNumber,
-        replyId,
       });
     }
 
@@ -72,8 +90,22 @@ export class SelectDayViaWhatsAppService {
   ) {
     const page = pageToken ? Number(pageToken.replace('p', '')) : 1;
 
-    const availableDays = await this.getAvailableDaysInCalendarService.execute(
-      env().google.calendarId as string,
+    const doctor =
+      await this.db.repositories.doctorRepository.getByRegistrationNumber(
+        DOCTOR_REGISTRATION_NUMBER,
+      );
+
+    if (!doctor) {
+      AppLogger.error(NOT_FOUND('Doctor'));
+
+      return this.sendTextMessageService.execute({
+        to: phoneNumber,
+        message: WHATSAPP_MESSAGES.errors.default,
+      });
+    }
+
+    const availableDays = await this.getAvailableDaysHelper.execute(
+      doctor.id,
       month,
       year,
     );

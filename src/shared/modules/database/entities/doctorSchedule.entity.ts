@@ -1,3 +1,4 @@
+import { DayOfWeek } from '@shared/enums';
 import {
   Column,
   Entity,
@@ -12,8 +13,13 @@ import { Doctor } from './doctor.entity';
 
 @Entity('doctor_schedules')
 export class DoctorSchedule extends BaseEntity {
-  @Column({ name: 'day_of_week', type: 'varchar', nullable: false })
-  dayOfWeek: string;
+  @Column({
+    name: 'day_of_week',
+    type: 'enum',
+    enum: DayOfWeek,
+    nullable: false,
+  })
+  dayOfWeek: DayOfWeek;
 
   @Column({ name: 'start_time', type: 'time', nullable: false })
   startTime: string;

@@ -2,11 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { DATE_PARAMETER } from '@shared/constants';
 import { Order } from '@shared/enums';
 import {
+  And,
   Between,
   DataSource,
   DeepPartial,
   EntityManager,
+  LessThan,
   MoreThan,
+  MoreThanOrEqual,
   Repository,
   UpdateResult,
 } from 'typeorm';
@@ -45,6 +48,19 @@ export class ConsultationRepository implements IConsultationRepository {
         },
       },
       order: { startDate: Order.ASC },
+    });
+  }
+
+  async getByDoctorIdAndPeriod(
+    doctorId: string,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<Consultation[]> {
+    return this.repository.find({
+      where: {
+        doctorId,
+        startDate: And(MoreThanOrEqual(startDate), LessThan(endDate)),
+      },
     });
   }
 

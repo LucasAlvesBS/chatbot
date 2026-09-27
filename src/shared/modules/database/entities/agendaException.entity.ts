@@ -12,9 +12,6 @@ import { Doctor } from './doctor.entity';
 
 @Entity('agenda_exceptions')
 export class AgendaException extends BaseEntity {
-  @Column({ type: 'date', nullable: false })
-  date: Date;
-
   @Column({ name: 'start_date', type: 'timestamp', nullable: false })
   @Index()
   startDate: Date;
